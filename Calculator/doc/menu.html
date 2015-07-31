@@ -1,0 +1,174 @@
+<html>
+<body bgcolor=FFFFFF>
+
+<p><strong>Up:</strong> <a href=index.html>Index</a>.
+<strong>Previous:</strong> <a href=language.html>Language</a></strong>.
+<strong>Next:</strong> <a href=cmdline.html>Command line</a></strong>.</p>
+
+<h1>Menus</h1>
+
+<strong>File</strong>
+<blockquote>
+The Import... and Export... items allow you to open and save all the
+symbols currently defined into a file. (A separate page describes the <a
+href=format.html>file format</a> used.)
+The Quit item allows you to exit the program.
+</p></blockquote>
+<strong>Edit</strong>
+<blockquote>
+When you have selected text in one of the text areas,
+you can cut, copy, and paste using the clipboard.
+</p></blockquote>
+<strong>Options</strong>
+<blockquote>
+Allows you to customize the engine's operation, the way in which
+expressions are displayed, and the interface. These choices are
+described in detail below.
+</p></blockquote>
+<strong>Help</strong>
+<blockquote>
+You can display this help system and get the version number from the
+Help menu.
+</p></blockquote>
+
+<h2>Engine options</h2>
+
+<strong>Maximum Reductions</strong>
+<blockquote>
+Some lambda expressions can never be completely simplified, such as the
+following.
+<center>
+<tt>(<img src=lambda.gif>x.x x x) (<img src=lambda.gif>x.x x x)</tt>
+</center>
+To avoid eating up too many resources, the engine limits how many steps
+it will perform before giving up.
+You can customize how many steps this will take.</p>
+
+<p>If you define a symbol to represent the result of an expression whose
+simplification process required more steps than given, <em>Lambda
+Calculator</em> will define the symbol as the <em>smallest</em> lambda
+expression it found during the process.
+</p></blockquote>
+<strong>Evaluation Order</strong>
+<blockquote>
+The intuitive way of applying an argument to a function is to
+evaluate the argument before sending it into the function.
+This is called the <em>applicative order</em> of evaluation
+(also called <em>eager</em> or <em>call-by-value</em> evaluation).
+The following illustrates how this works on one expression.
+<blockquote>
+<tt>(<img src=lambda.gif>x.* x x) (- 3 1)<br>
+  = (<img src=lambda.gif>x.* x x) 2
+  = * 2 2<br>
+  = 4
+</p></blockquote></p>
+
+<p>By default, however, <em>Lambda Calculator</em> uses
+<em>normal order</em>
+(also called <em>lazy</em> or <em>call-by-name</em> evaluation).
+In this system, an argument is
+passed into a function without evaluation.
+<blockquote>
+<tt>(<img src=lambda.gif>x.* x x) (- 3 1)<br>
+  = * (- 3 1) (- 3 1)<br>
+  = * 2 2<br>
+  = 4
+</p></blockquote>
+Here, we do not compute <tt>- 3 1</tt> until <em>after</em> it is passed
+into the function. We only compute its value once it becomes needed -
+which is why some people call it <em>lazy</em> evaluation.</p>
+
+<p>Notice, however, that when the argument is finally evaluated, it
+changes everywhere. Such an unevaluated argument is called a
+<em>thunk</em>, and simplification applied to it applies everywhere.
+If you select the "Normal Without Thunks" option, the program will
+not perform this optimization. This will mean that arguments may be
+evaluated multiple times, leading to more reductions.
+<blockquote>
+<tt>(<img src=lambda.gif>x.* x x) (- 3 1)<br>
+  = * (- 3 1) (- 3 1)<br>
+  = * 2 (- 3 1)<br>
+  = * 2 2<br>
+  = 4
+</p></blockquote>
+</p></blockquote>
+<strong>Use Applied Calculus</strong>
+<blockquote>
+If selected (as it is by default), then <em>Lambda Calculator</em> will
+include some built-in
+functions as described on the <a href=language.html>Language page</a>.
+This is convenient, but such built-in functions represent a sullying of
+the pure lambda calculus.</p>
+
+<p>If you unselect this option, <em>Lambda Calculus</em> uses the pure
+lambda calculus.
+</p></blockquote>
+<strong>Enable Eta Reductions</strong>
+<blockquote>
+If selected (the default), <em>Lambda Calculator</em>'s engine will
+enable eta reductions, in which expressions of the form <tt><img src=lambda.gif>x.f x</tt>
+reduce to simply <tt>f</tt>.
+</p></blockquote>
+
+<h2>Printing options</h2>
+
+<strong>Maximum Length</strong>
+<blockquote>
+The program can bound the number of characters displayed in an
+lambda expression; by default, it bounds the length at 100 characters.
+A bounded length makes the program run faster, because long expressions
+take a long time to convert into strings, and because long lines slow
+the text area in which the program prints.
+</p></blockquote>
+<strong>Print Lambda Characters</strong>
+<blockquote>
+If selected (the default), <em>Lambda Calculator</em> will display
+lambda characters, if the current font supports it.
+Otherwise, the program will use a backslash to represent a lambda
+character.
+</p></blockquote>
+<strong>Show Intermediate Steps</strong>
+<blockquote>
+If selected (the default), <em>Lambda Calculator</em> will display each
+step of the reduction as it is performed. Displaying these intermediate
+steps slows the computation process significantly, however, and you
+can turn it off by unselecting this option. In this case, only the
+initial lambda expression and its final value are displayed.
+</p></blockquote>
+<strong>Substitute Symbols</strong>
+<blockquote>
+If selected (the default), the program will attempt to represent any
+subexpressions of a printed expression that match with a defined
+symbol's value with the symbol instead.
+This can lead to lambda expressions that are easier to read.
+</p></blockquote>
+<strong>Vary Parentheses</strong>
+<blockquote>
+With this option selected (not the default), the program will
+intersperse brackets and braces sometimes in place of parentheses.
+(The specific system it uses is two parentheses, then a bracket, then
+two parentheses, then a brace.)
+For large expressions, this can help in determining which parentheses
+match.
+</p></blockquote>
+
+<h2>Interface options</h2>
+
+<strong>Font Size</strong>
+<blockquote>
+This sets the size of the characters displayed in the input and output
+fields.
+</p></blockquote>
+<strong>Show Browser</strong>
+<blockquote>
+If selected (the default), the program displays a list of all currently
+defined symbols at the left side of the window. Selecting an item from
+this list displays the value associated with the symbol.
+</p></blockquote>
+
+<p><strong>Up:</strong> <a href=index.html>Index</a>.
+<strong>Previous:</strong> <a href=language.html>Language</a></strong>.
+<strong>Next:</strong> <a href=cmdline.html>Command line</a></strong>.</p>
+
+</body>
+</html>

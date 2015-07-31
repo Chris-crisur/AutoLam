@@ -1,0 +1,61 @@
+<html>
+<body bgcolor=FFFFFF>
+
+<p><strong>Up:</strong> <a href=index.html>Index</a>.
+<strong>Next:</strong> <a href=language.html>Language</a></strong>.</p>
+
+<h1>Introduction</h1>
+
+<p>When you type a lambda expression into the input field labeled "as"
+and press Enter, the program will display the sequence of reductions it
+performs in simplifying your expression in the output text area below.
+For example, type the following
+in the wide text area at the window's top.
+<blockquote>
+<tt>(\x.* x x) (- 3 1)</tt>
+</blockquote>
+On most computers, when you type the backslash, a lambda will appear.
+Thus you'll actually see the following.
+<blockquote>
+<tt>(<img src=lambda.gif>x.* x x) (- 3 1)</tt>
+</blockquote>
+The <tt><img src=lambda.gif>x.* x x</tt> portion of this expression represents a function
+that takes a parameter <em>x</em> and returns the value of <em>x</em> *
+<em>x</em>. This expression says to pass the value of <tt>- 3 1</tt>
+as the parameter into this function.
+(Note that functions are written using prefix notation: You place the
+multiplication sign first, followed by the two arguments.)</p>
+
+<p>On pressing Enter, the program will display the following reductions
+to arrive at an answer.
+<blockquote>
+<tt>(<img src=lambda.gif>x.* x x) (- 3 1)<br>
+   = * (- 3 1) (- 3 1)<br>
+   = * 2 2<br>
+   = 4</tt>
+</blockquote>
+Thus, the program has computed an answer of 4.</p>
+
+<p>You can define symbols to represent lambda expressions by typing the
+symbol name into the "Define" field and the expression into the "as"
+field before pressing Enter.
+<blockquote>
+Define <tt>sq</tt> as <tt><img src=lambda.gif>x.* x x</tt>
+</blockquote>
+The calculator will simplify the expression (in this case, it's already
+simplified) and store it in its memory. If you reference the symbol
+later, the calculator will substitute the expression in its place.
+If you now ask the calculator to simplify
+<tt>sq (- 3 1)</tt>, it will display the following reductions.
+<blockquote>
+<tt>sq (- 3 1)<br>
+  = * (- 3 1) (- 3 1)<br>
+  = * 2 2<br>
+  = 4</tt>
+</blockquote></p>
+
+<p><strong>Up:</strong> <a href=index.html>Index</a>.
+<strong>Next:</strong> <a href=language.html>Language</a></strong>.</p>
+
+</body>
+</html>

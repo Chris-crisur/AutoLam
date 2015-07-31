@@ -1,0 +1,90 @@
+<html>
+<body bgcolor=FFFFFF>
+
+<p><strong>Up:</strong> <a href=index.html>Index</a>.
+<strong>Previous:</strong> <a href=menu.html>Menu</a></strong>.
+<strong>Next:</strong> <a href=format.html>File format</a></strong>.</p>
+
+<h1>Command Line</h1>
+
+<p>For those using a command-line system, <em>Lambda Calculator</em>
+allows the user to customize how the program begins based on its
+command-line parameters.
+To start <em>Lambda Calculator</em>, you would type the following at the
+command line.
+<blockquote>
+<tt>java lambda.jar [options] [filenames]</tt>
+</blockquote>
+The program will import the symbols listed in any mentioned files
+when it begins.
+(The files should be listed as described on the <a
+href=format.html>Format page</a>. Note that the Export... menu item
+automatically exports in this format.)</p>
+
+<p>The options include the following.
+For more details about what they mean, consult the documentation about
+the <a href=menu.html>Options menu</a>.</p>
+
+<p><tt>-max_reductions=#</tt></tt>
+<blockquote>
+Customizes the maximum number of steps. (Default: 100.)
+</p></blockquote>
+<tt>-evaluation_order={applicative,normal,normal_slow}</tt>
+<blockquote>
+Customizes the engine's evaluation order.
+The "<tt>normal_slow</tt>" option corresponds to "Normal Without
+Thunks."
+(Default: normal)
+</blockquote>
+<tt>-eta_reductions={yes,no}</tt>
+<blockquote>
+Selects whether eta reductions are enabled. (Default: yes)
+</blockquote>
+<tt>-use_applied={yes,no}</tt>
+<blockquote>
+Selects whether to use the applied lambda calculus. (Default: yes)
+</blockquote>
+<tt>-max_length=#</tt>
+<blockquote>
+Bounds the number of characters displayed in computed lambda
+expressions. (Default: 100)
+</blockquote>
+<tt>-show_intermediate={yes,no}</tt>
+<blockquote>
+Selects whether to show each individual reduction during simplification.
+(Default: yes)
+</blockquote>
+<tt>-substitute_symbols={yes,no}</tt>
+<blockquote>
+Selects whether to substitute symbols for matching subexpressions when
+displaying an expression.
+(Default: yes)
+</blockquote>
+<tt>-vary_parentheses={yes,no}</tt>
+<blockquote>
+Selects whether to intermix brackets and braces with parentheses when
+displaying expressions.
+(Default: no)
+</blockquote>
+<tt>-print-lambda={yes,no}</tt>
+<blockquote>
+Selects whether to show lambda characters (instead of backslashes) when
+displaying expressions.
+(Default: yes)
+<tt>-font_size=#</tt>
+<blockquote>
+Defines the point size of the font used in the text fields. (Default:
+14)
+</blockquote>
+<tt>-show_browser={yes,no}</tt>
+<blockquote>
+Selects whether the symbol browser should be displayed on the left side
+of the window. (Default: yes)
+</blockquote>
+
+<p><strong>Up:</strong> <a href=index.html>Index</a>.
+<strong>Previous:</strong> <a href=menu.html>Menu</a></strong>.
+<strong>Next:</strong> <a href=format.html>File format</a></strong>.</p>
+
+</body>
+</html>

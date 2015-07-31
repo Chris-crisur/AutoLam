@@ -1,0 +1,118 @@
+<html>
+<body bgcolor=FFFFFF>
+
+<p><strong>Up:</strong> <a href=index.html>Index</a>.
+<strong>Previous:</strong> <a href=intro.html>Introduction</a></strong>.
+<strong>Next:</strong> <a href=menu.html>Menus</a></strong>.</p>
+
+<h1>Language</h1>
+
+<p>Lambda expressions are built based on four simple rules.
+<ol>
+
+<li>A single identifier is a lambda expression. <em>Lambda
+Calculator</em> will treat any string of non-space characters
+as an identifier, as long as it does not contain a backslash,
+period, parenthesis, bracket, or brace.</p>
+
+<li>A function can be <em>applied</em> to an argument by writing a
+lambda expression representing the function and then another lambda
+expression representing the argument.
+The expression "<tt>fact 4</tt>" would represent a call to the
+<tt>fact</tt> function passing <tt>4</tt> as its parameter.
+Note that parentheses are not necessary surrounding the function
+argument.</p>
+
+<li>A lambda expression can be <em>abstracted</em> by writing a
+lambda (represented with a backslash in <em>Lambda Calculator</em>),
+then an identifier, then a period, then the lambda expression.
+This represents a function whose parameter is named as in the identifier
+and whose return value is the value computed by the lambda expression.
+For example, "<tt><img src=lambda.gif>x.x</tt>" represents the identity function.</p>
+
+<li>Finally, you can give parentheses to clarify precedence.
+You can alternatively use brackets ('[]') or braces ('{}');
+these alternatives can be useful when you have a long expression and
+have a difficult time matching parentheses.
+
+</ol></p>
+
+<p>Without parentheses, a function application has a higher order of
+precedence than function abstraction, and function applications are
+left-associative. For example, the expression
+"<tt><img src=lambda.gif>x.f g x</tt>"
+would represent a function that takes in an argument <em>x</em> and
+returns the
+result of applying <em>g</em> to <em>f</em>, then <em>x</em> to the
+function that this returns.
+If you want instead to pass <em>x</em> to <em>g</em> and the result to
+<em>f</em>, you would need parentheses:
+"<tt><img src=lambda.gif>x.f (g x)</tt>". This latter expression would represent a
+function the functional composition of <em>f</em> and <em>g</em>.</p>
+
+<p>Thus, when we consider the lambda expression
+<center>
+<tt>(<img src=lambda.gif>x.* x x) (- 3 1)</tt>
+</center>
+we see that <em>Lambda Calculator</em> will understand this
+as the application of the argument <tt>(- 3 1)</tt> (whose value is 2)
+into the function taking <em>x</em> as a parameter and returning the
+value of <tt>* x x</tt>. The value of <tt>* 2 2</tt>, and hence of this
+lambda expression, is 4.</p>
+
+<p>The following lambda expression is a more difficult one.
+<center>
+<tt>(<img src=lambda.gif>f.<img src=lambda.gif>z.f (f z)) (<img src=lambda.gif>x.* x x) (- 3 1)</tt>
+</center>
+The first parenthesized term represents a function that takes <em>f</em>
+as a parameter and returns a function taking <em>z</em> as a parameter
+and returning the value of <tt>f (f z)</tt>.
+In this case, we pass the function "<tt><img src=lambda.gif>x.* x x</tt>" into this
+function as <tt>f</tt>, and so we get the function taking <em>z</em> as
+a parameter and returning the value of
+<center>
+<tt>(<img src=lambda.gif>x.* x x) ((<img src=lambda.gif>x.* x x) z)</tt>
+</center>
+Into this function we pass the value of <tt>(- 3 1)</tt>, which is 2.
+Simplifying our expression, we get
+<center>
+<tt>(<img src=lambda.gif>x.* x x) (* 2 2)</tt><br>
+<tt>(<img src=lambda.gif>x.* x x) 4</tt><br>
+<tt>* 4 4</tt>
+</center>
+Thus, we arrive at 16. (Note, however, that <em>Lambda Calculator</em>
+would simplify the expression in a different order.)</p>
+
+<h2>The applied calculus</h2>
+
+<p>When the "Use Applied Calculus" option is selected (as it is by
+default), the engine
+includes a variety of computational functions already.
+<center><table>
+<tr><th><tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt></th>
+  <td>take two numerical identifiers and return an identifier
+    representing the binary operation applied to them.</td></tr>
+<tr><th><tt>&lt;</tt>, <tt>&gt;</tt>, <tt>&lt;=</tt>, <tt>&gt;=</tt>,
+		<tt>=</tt>, <tt>/=</tt></th>
+  <td>take two numerical identifiers and return the identifier
+    <tt>true</tt> or <tt>false</tt> representing how they compare.
+	(The <tt>/=</tt> function represents inequality.)</td></tr>
+<tr><th><tt>if</tt></th>
+  <td>take three values, the first being the identifier
+    <tt>true</tt> or <tt>false</tt>, returning the second value
+	if the identifier is <tt>true</tt> and the third if it is
+	<tt>false</tt>.</td></tr>
+</table></center>
+
+<p><strong>Note:</strong> If you have selected the applicative
+evaluation, the built-in <tt>if</tt> function will not necessarily
+compute as you might expect. The engine will attempt to evaluate all
+three arguments first before applying the <tt>if</tt> function,
+which could lead to unnecessary infinite computation.</p>
+
+<p><strong>Up:</strong> <a href=index.html>Index</a>.
+<strong>Previous:</strong> <a href=intro.html>Introduction</a></strong>.
+<strong>Next:</strong> <a href=menu.html>Menus</a></strong>.</p>
+
+</body>
+</html>

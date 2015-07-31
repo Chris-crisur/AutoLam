@@ -1,0 +1,477 @@
+
+<!DOCTYPE html>
+<html><head>
+ <meta charset="utf-8">
+ <title>Lambda Calculator</title>
+ <link rel="stylesheet" href="lambda.css" type="text/css">
+ <link rel="shortcut icon" href="favicon.ico">
+</head><body>
+
+<div id="reduceContainer"><div id="reduceSub">
+<h1>Lambda Calculator</h1>
+
+<p><a id="dictionaryIcon"><img alt="[Dictionary]" src="img/dict.png"></a>
+<a id="optionsIcon"><img alt="[Options]" src="img/options.png"></a>
+<a id="docIcon"><img alt="[Documentation]" src="img/help.png"></a>
+</p>
+
+<form id="reduceForm">
+ <input>
+ <button class="imgbutton" type="submit"><img alt="[Submit]" src="img/ok.png"></button>
+ <button class="imgbutton" type="reset"><img alt="[Clear]" src="img/clear.png"></button>
+</form>
+
+<div id="reduction"></div>
+
+<form id="addForm">
+ <input>
+ <button class="imgbutton" type="submit"><img alt="[Add to Dictionary]" src="img/dictadd.png"></button>
+ <span id="addFeedback"></span>
+</form>
+</div></div>
+
+<div id="overlay">
+
+<div id="dictionaryDlog" class="dlog">
+<div class="dlogHeader"><img alt="(dictionary icon)" src="img/dict.png"> Dictionary</div><div class="dlogContents">
+
+<table id="dictionary"></table>
+
+<form id="dictionaryShow">
+ <button type="submit">Show Text</button><br />
+ <textarea id="dictionaryText" readonly="readonly"></textarea>
+</form>
+
+</div><div class="dlogClose">
+ <form id="dictionaryForm">
+ <button class="imgbutton" type="submit"><img alt="[Close]" src="img/ok.png"></button>
+ </form>
+</div></div>
+
+<div id="optionsDlog" class="dlog"><form id="optionsForm">
+<div class="dlogHeader"><img alt="(options icon)" src="img/options.png"> Options</div><div class="dlogContents"> 
+<table><tbody>
+<tr><td colspan="2"><h2>Engine</h2></td></tr>
+<tr><td><label for="maxReductionsCombo">Maximum Reductions</label></td>
+	<td><select id="maxReductionsCombo"></select></td></tr>
+<tr><td><label for="evalOrderCombo">Evaluation Order</label></td>
+	<td><select id="evalOrderCombo"></select></td></tr>
+<tr><td><label for="calcTypeCombo">Calculus Type</label></td>
+	<td><select id="calcTypeCombo"></select></td></tr>
+<tr><td><label for="useEtasCheck">Use Eta Reductions</label></td>
+	<td><input type="checkbox" id="useEtasCheck"></td></tr>
+
+<tr><td colspan="2"><h2>Display</h2></td></tr>
+<tr><td><label for="substSymbolsCheck">Substitute Symbols</label></td>
+	<td><input type="checkbox" id="substSymbolsCheck"></td></tr>
+<tr><td><label for="showIntermediateCheck">Show Intermediate Steps</label></td>
+	<td><input type="checkbox" id="showIntermediateCheck"></td></tr>
+<tr><td><label for="varyParensCheck">Vary Parentheses/Brackets</label></td>
+	<td><input type="checkbox" id="varyParensCheck"></td></tr>
+<tr><td><label for="maxLengthCombo">Maximum Display Width</label></td>
+	<td><select id="maxLengthCombo"></select></td></tr>
+</tbody></table>
+
+</div><div class="dlogClose">
+ <button class="imgbutton" type="submit"><img alt="[Close]" src="img/ok.png"></button>
+</div></form></div>
+
+<div id="docDlog" class="dlog">
+<div class="dlogHeader"><img alt="(documentation icon)" src="img/help.png"> Documentation</div><div class="dlogContents">
+<div class="docContents">
+<a href="#" id="docAboutItem">About</a>
+<a href="#" id="docBackgroundItem">Background</a>
+<a href="#" id="docBasicsItem">Basic Use</a>
+<a href="#" id="docDictionaryItem">Dictionary</a>
+<a href="#" id="docOptionsItem">Options</a>
+</div><div id="docSections">
+
+<div class="docSection" id="docAboutSec">
+
+<p><em>Lambda Calculator</em> is a JavaScript-based engine for the lambda
+calculus invented by Alonzo Church. It allows the user to enter a lambda
+expression and see the sequence of reductions taken by the engine as it
+reduces the expression to normal form. The program allows a variety of
+customization options, including choices between the pure calculus and a
+simple applied calculus and between eager and lazy evaluation. It is a
+useful tool for learning and experimenting with the lambda calculus.</p>
+
+<p><em>Lambda Calculator</em> (&copy; 2012) is by Carl Burch, a computer science
+professor at Hendrix College. [<a href="http://www.cburch.com/">personal page</a>]
+The &ldquo;official&rdquo; page for the Web application is
+<em><a href="http://www.cburch.com/lambda/">www.cburch.com/lambda/</a></em>.
+The source code is available at
+<em><a href="http://www.cburch.com/lambda/source/">www.cburch.com/lambda/source/</a></em>
+and is released under the terms of
+<a href="http://www.mozilla.org/MPL/">Mozilla Public License 2.0</a>.</p>
+
+<p>Icons are from the Oxygen icon theme
+(<em><a href="http://www.oxygen-icons.org/">oxygen-icons.org</a></em>)
+and are available under the
+<a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 License</a>
+or the
+<a href="http://www.gnu.org/licenses/lgpl.html">GNU Library General Public License</a>.</p>
+
+</div>
+
+<div class="docSection" id="docBackgroundSec">
+
+<p>Despite its name, &ldquo;the lambda calculus&rdquo; has nothing to do
+with the calculus you may have studies involving differentials and
+integrals. In fact, it is a very basic system of mathematics.</p>
+
+<p>It starts with some new notation to talk about a function.
+For example, consider the function that takes a number as a parameter
+and produces the number's square as its result.
+Traditionally, we would notate this as the function
+&ldquo;<var>f</var>(<var>x</var>)&nbsp;=&nbsp;<var>x</var>&sup2;&rdquo;;
+but in the lambda calculus we instead describe it as
+&ldquo;&lambda;<var>x</var>.<var>x</var>&sup2;&rdquo;.</p>
+
+<p>Notice that the lambda calculus doesn't involve giving the function
+a name. You can see the &lambda; symbol in it (the Greek letter
+<em>lambda</em>), but that isn't a name: It's simply notation to indicate
+that we're beginning to describe a function.
+The choice of <var>x</var> is arbitrary;
+&ldquo;&lambda;<var>q</var>.<var>q</var>&sup2;&rdquo;
+describes the exact same function.</p>
+
+<p>We can build a larger expression using <b>function application</b>.
+In traditional mathematics, we'd write
+&ldquo;<var>f</var>(5)&rdquo; to indicate that we are evaluating
+<var>f</var> for when its parameter is 5.
+In lambda calculus's notation, parentheses for parameters are optional,
+but we'll use parentheses to indicate the extent of
+a function's description. We would instead write:</p>
+
+<div class="eqn">(&lambda;<var>x</var>.<var>x</var>&sup2;)&nbsp;5</div>
+
+<p>Given this basic expression, we can <b>reduce</b> it.
+by simply passing the parameter into the function. This operation of substituting a value for a parameter name (<var>x</var> in this example) is technically called a <b>beta reduction</b>.</p>
+
+<div class="eqn">(&lambda;<var>x</var>.<var>x</var>&sup2;)&nbsp;5
+&rArr; 5&sup2;</div>
+
+<p>Of course, from here we can apply basic mathematics to conclude that
+&ldquo;(&lambda;<var>x</var>.<var>x</var>&sup2;)&nbsp;5&rdquo;
+reduces to 25.</p>
+
+<p>Let's look at a more complex example.
+In this example, we're working with two different functions,
+where the parameter to the first function is computed by passing
+parameter into the second function. Since there are two functions involved
+here, we'll end up performing two different beta reductions (in the first step and the third step).</p>
+
+<table><tbody><tr>
+<td colspan="2">(&lambda;<var>y</var>.4&nbsp;&times;&nbsp;<var>y</var>)&nbsp;((&lambda;<var>z</var>.<var>z</var>&sup2;&nbsp;+&nbsp;2&nbsp;&times;&nbsp;<var>z</var>)&nbsp;5)</td>
+</tr><tr><td>&rArr;</td>
+<td>(&lambda;<var>y</var>.4&nbsp;&times;&nbsp;<var>y</var>)&nbsp;(<var>5</var>&sup2;&nbsp;+&nbsp;2&nbsp;&times;&nbsp;<var>5</var>)</td>
+</tr><tr><td>&rArr;</td>
+<td>(&lambda;<var>y</var>.4&nbsp;&times;&nbsp;<var>y</var>)&nbsp;35</td>
+</tr><tr><td>&rArr;</td>
+<td>4&nbsp;&times;&nbsp;35</td>
+</tr><tr><td>&rArr;</td>
+<td>140</td>
+</tr></tbody></table>
+
+<p>Function application is left-associative. Suppose we write the following instead (just omitting one set of parentheses).</p>
+
+<div class="eqn">(&lambda;<var>y</var>.4&nbsp;&times;&nbsp;<var>y</var>)&nbsp;(&lambda;<var>z</var>.<var>z</var>&sup2;&nbsp;+&nbsp;2&nbsp;&times;&nbsp;<var>z</var>)&nbsp;5</div>
+
+<p>Here we have three pieces separated by spaces:
+The <var>y</var>-parameter function,
+then a <var>z</var>-parameter function,
+then the number 5.
+This actually indicates that we should apply the <var>z</var>-parameter
+function into the <var>y</var>-parameter function first, and we should pass 5 into the result. We can go ahead with the first beta reduction to arrive at the following.</p>
+
+<div class="eqn">(4&nbsp;&times;&nbsp;(&lambda;<var>z</var>.<var>z</var>&sup2;&nbsp;+&nbsp;2&nbsp;&times;&nbsp;<var>z</var>))&nbsp;5</div>
+
+<p>In the lambda calculus, this is nonsensical:
+We wouldn't talk about multiplying a number (4) by a function.
+But the lambda calculus is meant to be as simple as possible.
+It simply dictates the rules of reducing an expression,
+even if in this case the rule says to reduce to irreducible nonsense.</p>
+
+<p>Of course, sometimes we actually want this behavior. Consider the following sequence of reductions.</p>
+
+<table><tbody><tr>
+<td colspan="2">(&lambda;<var>f</var>.[&lambda;<var>a</var>.<var>f</var> (<var>f</var> <var>a</var>)]) (&lambda;<var>b</var>.<var>b</var>&sup2;) 5</td>
+</tr><tr><td>&rArr;</td>
+<td>[&lambda;<var>a</var>.(&lambda;<var>b</var>.<var>b</var>&sup2;) ((&lambda;<var>b</var>.<var>b</var>&sup2;) <var>a</var>)] 5</td>
+</tr><tr><td>&rArr;</td>
+<td>(&lambda;<var>b</var>.<var>b</var>&sup2;) ((&lambda;<var>b</var>.<var>b</var>&sup2;) 5)</td>
+</tr><tr><td>&rArr;</td>
+<td>(&lambda;<var>b</var>.<var>b</var>&sup2;) (5&sup2;)</td>
+</tr><tr><td>&rArr;</td>
+<td>(&lambda;<var>b</var>.<var>b</var>&sup2;) 25</td>
+</tr><tr><td>&rArr;</td>
+<td>25&sup2;</td>
+</tr><tr><td>&rArr;</td>
+<td>625</td>
+</tr></tbody></table>
+
+<p>Here our first step was to substitute a lambda expression for the letter <var>f</var>. That produced another function taking a parameter named <var>a</var>, which we could accommodate by substituting in 5. There are two more beta reductions before we arrive at the final result of 625.</p>
+
+</div>
+
+<div class="docSection" id="docBasicsSec">
+
+<p>This Web app's job is simply to reduce an expression you type until
+it reaches a form that can be reduced no further. To enter an
+expression, type it into the text field near the page's top and
+then either press the Enter key or click the checkmark
+<img alt="" class="inlineimg" src="img/ok.png">.
+The Web app will show the outcome of the computation below.</p>
+
+<p>So what can you type into the text field?
+In the simplest case, you can simply enter an arithmetic expression.
+But the Web app always expects you to express expressions in prefix
+notation:
+Rather than write an arithmetic operator between its two
+parameters, you will write the arithmetic operator first followed by its
+two parameters.
+For example, to compute 6&nbsp;&times;&nbsp;9, you'd type
+&ldquo;<kbd>*&nbsp;6&nbsp;9</kbd>&rdquo;.
+And to compute 6&nbsp;&times;&nbsp;9&nbsp;&minus;12, you'd type
+&ldquo;<kbd>-&nbsp;(*&nbsp;6&nbsp;9)&nbsp;12</kbd>&rdquo;.</p>
+
+<p>Of course, the Web app can also handle functions written using lambda notation.
+Suppose we want to compute the value of the following.</p>
+
+<div class="eqn">(&lambda;<var>y</var>.4&nbsp;&times;&nbsp;<var>y</var>)&nbsp;((&lambda;<var>z</var>.<var>z</var>&sup2;&nbsp;+&nbsp;2&nbsp;&times;&nbsp;<var>z</var>)&nbsp;5)</div>
+
+<p>Since most keyboards aren't outfitted with a lambda key,
+we'll instead use backslashes.</p>
+
+<div class="eqn"><kbd>(\y.*&nbsp;4&nbsp;y)&nbsp;((\z.+&nbsp;(*&nbsp;z&nbsp;z&nbsp;)&nbsp;(*&nbsp;2&nbsp;z))&nbsp;5)</kbd></div>
+
+<p>Sometimes expressions become difficult to read due to the many
+parentheses.
+Feel free to use matched set of brackets (<kbd>[</kbd> and <kbd>]</kbd>)
+or braces (<kbd>{</kbd> and <kbd>}</kbd>).</p>
+
+<div class="eqn"><kbd>(\y.*&nbsp;4&nbsp;y)&nbsp;([\z.+&nbsp;(*&nbsp;z&nbsp;z&nbsp;)&nbsp;(*&nbsp;2&nbsp;z)]&nbsp;5)</kbd></div>
+
+<p>You always need spaces or parentheses to indicate function application;
+when symbols are mashed together (as in <kbd>*4y</kbd>), the Web app reads
+them together as a single symbol.</p>
+
+<p>With the applied lambda calculus (the default),
+several symbols have a special meaning:
+For instance, any sequence of only digits is understood to represent
+the corresponding integer, even if it has a negative sign in front. We also have the following operators:</p>
+
+<table><tbody>
+<tr><td class="nobrk"><kbd>+</kbd>, <kbd>-</kbd>, <kbd>*</kbd>, <kbd>/</kbd></td>
+	<td>given two integers, apply the arithmetic operation to them</td></tr>
+<tr><td class="nobrk"><kbd>=</kbd>, <kbd>/=</kbd>, <kbd>&lt;</kbd>, <kbd>&gt;</kbd>, <kbd>&lt;=</kbd>, <kbd>&gt;=</kbd></td>
+	<td>given two integers, apply the comparison to arrive at the identifier <kbd>true</kbd> or <kbd>false</kbd></td></tr>
+<tr><td class="nobrk"><kbd>if</kbd></td>
+	<td>given three values of which the first is either <kbd>true</kbd> or <kbd>false</kbd>, return the second value if the first is <kbd>true</kbd> and the third if the first is <kbd>false</kbd></td></tr>
+</tbody></table>
+
+</div>
+
+<div class="docSection" id="docDictionarySec">
+
+<p>You can define symbols to correspond to expressions.
+For example, suppose we want to define the symbol <var>sq</var>
+to stand for the function &lambda;<var>z</var>.<var>z</var>&sup2;.
+To do this, we'd first enter the expression
+&ldquo;<kbd>\z.*&nbsp;z&nbsp;z</kbd>&rdquo;
+into the main text field and press Enter.
+Below its reduction, you will see a text field with an
+&ldquo;add to dictionary&rdquo; icon
+<img alt="" class="inlineimg" src="img/dictadd.png">.
+Type the symbol name &ldquo;<kbd>sq</kbd>&rdquo; into the
+field and either press enter or click the icon.</p>
+
+<p>Now you can freely use this symbol in other expressions, and
+it will always translate into the expression from the
+dictionary. For example, you could enter &ldquo;<kbd>sq&nbsp;6</kbd>&rdquo;,
+and it would be reduced to 36.</p>
+
+<p>Ways to edit and view the dictionary:</p>
+
+<ul>
+
+<li><p><b>To redefine a symbol</b> to stand for another expression:
+Simply re-add the same symbol into the dictionary; the
+previous definition will be overwritten.</p></li>
+
+<li><p><b>To view all definitions</b> in the current dictionary:
+Select the dictionary
+icon <img alt="" class="inlineimg" src="img/dict.png">.</p></li>
+
+<li><p><b>To delete a definition:</b> While viewing the dictionary,
+select the definition to bring up a delete icon
+<img alt="" class="inlineimg" src="img/clear.png">,
+and then select the delete icon.</p></li>
+
+<li><p><b>To export the dictionary:</b>
+While viewing the dictionary, select the
+&ldquo;Show Text&rdquo; button. A text area appears summarizing
+all definitions in ASCII form.</p>
+
+</ul>
+</div>
+
+<div class="docSection" id="docOptionsSec">
+
+<p>Options are available through selecting the wrench icon
+<img alt="" class="inlineimg" src="img/options.png">.
+They are divided into two categories,
+&ldquo;Engine&rdquo; and &ldquo;Display&rdquo;</p>
+
+<h2>Engine</h2>
+
+<dl>
+
+<dt>Maximum Reductions</dt>
+<dd><p>This is the maximum number of reductions that will be
+performed. Some expressions, such as
+&ldquo;(&lambda;<var>x</var>.<var>x</var>&nbsp;<var>x</var>)&nbsp;(&lambda;<var>x</var>.<var>x</var>&nbsp;<var>x</var>)&rdquo;, will never attain
+normal form, so we need some sort of limit to avoid an infinite loop.
+Moreover, some expressions expand so large after several reductions that
+they need to be terminated to avoid taking an inordinate amount of time.</p></dd>
+
+<dt>Evaluation Order</dt>
+<dd><p>Configures the rule used to choose which reductions to perform.
+The most intuitive is &ldquo;eager evaluation&rdquo;, in which
+parameters are always evaluated before using them to evaluate a function's
+result. In the following example (which uses infix operators for clarity),
+we begin by computing the parameter of 9
+before we give the value into the <var>y</var>-parameter function.</p>
+
+<table><tbody><tr>
+<td colspan="2">(&lambda;<var>y</var>.<var>y</var>&nbsp;&times;&nbsp;<var>y</var>)&nbsp;((&lambda;<var>z</var>.<var>z</var>&nbsp;+&nbsp;5)&nbsp;4)</td>
+</tr><tr><td>&rArr;</td>
+<td>(&lambda;<var>y</var>.<var>y</var>&nbsp;&times;&nbsp;<var>y</var>)&nbsp;(4&nbsp;+&nbsp;5)</td>
+</tr><tr><td>&rArr;</td>
+<td>(&lambda;<var>y</var>.<var>y</var>&nbsp;&times;&nbsp;<var>y</var>)&nbsp;9</td>
+</tr><tr><td>&rArr;</td>
+<td>9&nbsp;&times;&nbsp;9</td>
+</tr><tr><td>&rArr;</td>
+<td>81</td>
+</tr></tbody></table>
+
+<p>In &ldquo;normal evaluation&rdquo;, we always pass expressions as parameters without any attempt to reduce them; we only reduce them later, as
+needed. Starting from the same point as above, the <em>first</em> step
+is to substitute for <var>y</var>, and only later do we find that the expression passed for <var>y</var> reduces to 9.</p>
+
+<table><tbody><tr>
+<td colspan="2">(&lambda;<var>y</var>.<var>y</var>&nbsp;&times;&nbsp;<var>y</var>)&nbsp;((&lambda;<var>z</var>.<var>z</var>&nbsp;+&nbsp;5)&nbsp;4)</td>
+</tr><tr><td>&rArr;</td>
+<td>((&lambda;<var>z</var>.<var>z</var>&nbsp;+&nbsp;5)&nbsp;4)&nbsp;&times;&nbsp;((&lambda;<var>z</var>.<var>z</var>&nbsp;+&nbsp;5)&nbsp;4)</td>
+</tr><tr><td>&rArr;</td>
+<td>(4&nbsp;+&nbsp;5)&nbsp;&times;&nbsp;((&lambda;<var>z</var>.<var>z</var>&nbsp;+&nbsp;5)&nbsp;4)</td>
+</tr><tr><td>&rArr;</td>
+<td>9&nbsp;&times;&nbsp;((&lambda;<var>z</var>.<var>z</var>&nbsp;+&nbsp;5)&nbsp;4)</td>
+</tr><tr><td>&rArr;</td>
+<td>9&nbsp;&times;&nbsp;(4&nbsp;+&nbsp;5)</td>
+</tr><tr><td>&rArr;</td>
+<td>9&nbsp;&times;&nbsp;9</td>
+</tr><tr><td>&rArr;</td>
+<td>81</td>
+</tr></tbody></table>
+
+<p>The advantage of normal evaluation is that a parameter is never computed if it happens that the function never uses it. However, it has the disadvantage that parameters are re-computed each time that the function needs it; in the above example, we perform the same addition twice in the course of the computation, and so the computation takes longer.</p>
+
+<p>In &ldquo;lazy evaluation&rdquo;, we track repetitions of a parameter;
+when we reduce one, we track all others. This allows each parameter to be computed just once &mdash; or not at all if the function happens never to use the parameter.</p>
+
+<table><tbody><tr>
+<td colspan="2">(&lambda;<var>y</var>.<var>y</var>&nbsp;&times;&nbsp;<var>y</var>)&nbsp;((&lambda;<var>z</var>.+&nbsp;<var>z</var>&nbsp;5)&nbsp;4)</td>
+</tr><tr><td>&rArr;</td>
+<td>((&lambda;<var>z</var>.<var>z</var>&nbsp;+&nbsp;5)&nbsp;4)&nbsp;&times;&nbsp;((&lambda;<var>z</var>.<var>z</var>&nbsp;+&nbsp;5)&nbsp;4)</td>
+</tr><tr><td>&rArr;</td>
+<td>(4&nbsp;+&nbsp;5)&nbsp;&times;&nbsp;(4&nbsp;+&nbsp;5)</td>
+</tr><tr><td>&rArr;</td>
+<td>9&nbsp;&times;&nbsp;9</td>
+</tr><tr><td>&rArr;</td>
+<td>81</td>
+</tr></tbody></table>
+
+<p>The default is &ldquo;lazy evaluation&rdquo;, since it arrives at its conclusion with the fewest reductions.</p>
+
+</dd>
+
+<dt>Calculus Type</dt>
+<dd><p>If &ldquo;applied calculus&rdquo; is selected, the calculator will
+perform basic arithmetic and comparisons, including the following:</p>
+
+<table><tbody>
+<tr><td class="nobrk"><kbd>+</kbd>, <kbd>-</kbd>, <kbd>*</kbd>, <kbd>/</kbd></td>
+	<td>given two integers, applies the arithmetic operation to them</td></tr>
+<tr><td class="nobrk"><kbd>=</kbd>, <kbd>/=</kbd>, <kbd>&lt;</kbd>, <kbd>&gt;</kbd>, <kbd>&lt;=</kbd>, <kbd>&gt;=</kbd></td>
+	<td>given two integers, applies the comparison to arrive at the identifier <kbd>true</kbd> or <kbd>false</kbd></td></tr>
+<tr><td class="nobrk"><kbd>if</kbd></td>
+	<td>given three values of which the first is either <kbd>true</kbd> or <kbd>false</kbd>, return the second value if the first is <kbd>true</kbd> and the third if the first is <kbd>false</kbd></td></tr>
+</tbody></table>
+
+<p>However, the lambda calculus can be used with no such
+primitives. This is called &ldquo;the pure lambda calculus&rdquo;.
+If this is selected, there are no symbols; the only thing the calculator
+will do is to apply beta and eta reductions.</p>
+
+<p>You can also select &ldquo;pure calculus with numerals&rdquo;.
+This defines the nonnegative integers to correspond to particular lambda expressions as suggested by Alonzo Church:</p>
+
+<table><tbody>
+<tr><td><kbd>0</kbd>:</td>
+	<td>&lambda;<var>s</var>.&lambda;<var>z</var>.<var>z</var></td></tr>
+<tr><td><kbd>1</kbd>:</td>
+	<td>&lambda;<var>s</var>.&lambda;<var>z</var>.<var>s</var>&nbsp;<var>z</var></td></tr>
+<tr><td><kbd>2</kbd>:</td>
+	<td>&lambda;<var>s</var>.&lambda;<var>z</var>.<var>s</var>&nbsp;(<var>s</var>&nbsp;<var>z</var>)</td></tr>
+<tr><td><kbd>3</kbd>:</td>
+	<td>&lambda;<var>s</var>.&lambda;<var>z</var>.<var>s</var>&nbsp;(<var>s</var>&nbsp;(<var>s</var>&nbsp;<var>z</var>))</td></tr>
+<tr><td colspan="2">(and so on)</td></tr>
+</tbody></table>
+
+</dd>
+
+<dt>Use Eta Reductions</dt>
+<dd><p><p>An <b>eta reduction</b> allows expressions of the form
+&ldquo;&lambda;<var>x</var>.<var>???</var>&nbsp;<var>x</var>&rdquo;
+to be reduced simply to <var>???</var> when the expression <var>???</var>
+has no occurrences of <var>x</var>. Some do not like this type of reduction, so you can disable it by unchecking this option.</p></dd>
+
+</dl>
+
+<h2>Display</h2>
+
+<dl>
+
+<dt>Substitute Symbols</dt>
+<dd><p>If checked, when displaying lambda expressions it does an exhaustive search for opportunities to replace equivalent subexpressions in the dictionary with corresponding symbols; of course, it cannot determine the suitability of these replacements. If unchecked, the full lambda expression is always displayed with no such substitutions. Of course, it is faster not to search for dictionary subexpressions, but the lambda expressions are usually harder to interpret.</p></dd>
+
+<dt>Show Intermediate Steps</dt>
+<dd><p>If checked, the result of each individual reduction is stored and you have the option of viewing intermediate steps.</p></dd>
+
+<dt>Vary Parentheses</dt>
+<dd><p>If checked, displayed expressions will occasionally include matched
+sets of square brackets or curly braces in place of parentheses
+to help with identifying pairs. If unchecked, only parentheses are
+used.</p></dd>
+
+<dt>Maximum Display Width</dt>
+<dd><p>For expressions that expand to be longer than indicated in this
+setting, an ellipsis (&hellip;) is included.</p></dd>
+
+</dl>
+</div>
+
+</div></div><div class="dlogClose">
+ <form id="docForm">
+ <button class="imgbutton" type="submit"><img alt="[Close]" src="img/ok.png"></button>
+ </form>
+</div></div>
+
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="lambda-min.js"></script>
+
+</body></html>
