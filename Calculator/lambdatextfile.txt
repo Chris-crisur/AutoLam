@@ -1,0 +1,8 @@
+1
+  \f.\x.f x
+inc
+  \a.\f.\x.f (a f x)
+*
+  \a.\b.\f.a (b f)
+a1
+ (\x. x) k

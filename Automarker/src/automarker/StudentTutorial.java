@@ -16,6 +16,7 @@ public class StudentTutorial extends javax.swing.JFrame {
      * Creates new form StudentTutorial
      */
     public StudentTutorial() {
+        //TODO: add welcome message and questions
         initComponents();
     }
 
