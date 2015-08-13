@@ -11,14 +11,16 @@ package automarker;
  * @author Annie
  */
 public class Line {
+    private static int idCount = 0;
     private int id;
     private String expression;
     private char reduction;
     private String reasoning;
     private double mark;
 
-    public Line(int id, String expression, char reduction, String reasoning) {
-        this.id = id;
+    public Line(String expression, char reduction, String reasoning) {
+        idCount += 1;
+        id = idCount;
         this.expression = expression;
         this.reduction = reduction;
         this.reasoning = reasoning;

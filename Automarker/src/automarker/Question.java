@@ -11,13 +11,15 @@ package automarker;
  * @author Annie
  */
 public class Question {
+    private static int idCount = 0;
     private int id;
     private String description;
     private double maxMark;
     private String requirements; //maybe ENUM or int?
 
-    public Question(int id, String description, double maxMark, String requirements) {
-        this.id = id;
+    public Question(String description, double maxMark, String requirements) {
+        idCount += 1;
+        id = idCount;
         this.description = description;
         this.maxMark = maxMark;
         this.requirements = requirements;
