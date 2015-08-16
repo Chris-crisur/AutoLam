@@ -105,7 +105,7 @@ public class Solution {
         sb.append("Solution " + id +  
                 "\nDate Created: " + dateCreated +
                 "\nDate Submitted: " + dateSubmitted +
-                "\nQuestion:" + question.toString() +
+                "\nQuestion: " + question.toString() +
                 "\nAnswer: \n");
         for (Line line : lines) {
             sb.append(line).append("\n");
@@ -118,14 +118,15 @@ public class Solution {
         return "Solution{" + "id=" + id + ", question=" + question + ", lines=" + lines + ", dateCreated=" + dateCreated + ", dateSubmitted=" + dateSubmitted + '}';
     }
     
-    public String toStringCrossTest(){
+    public String outputFormat(){
         StringBuilder sb = new StringBuilder();
-        sb.append("Solution(").append("new ").append(question.toStringCrossTest()).append(", new Line[1]");
-        
+        sb.append("S" + id +  
+                "\nD" + dateSubmitted +
+                "\nQ" + question.outputFormat() +
+                "\nA:\n");
         for (Line line : lines) {
-            sb.append("new ").append(line.toStringCrossTest()).append("\n");
+            sb.append(line.outputFormat()).append("\n");
         }
-        
         return sb.toString();
     }
     

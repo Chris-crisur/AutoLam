@@ -1,0 +1,65 @@
+3
+S1
+Dnull
+Q1
+#Question 1 description
+<20.0
+!
+>(\x.x) b
+A:
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+
+S2
+Dnull
+Q2
+#Question 2 description
+<12.5
+!Associative
+>(\x.x) b
+A:
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+
+S3
+Dnull
+Q3
+#Question 3 description which continues to the next line
+<100.0
+!Normal
+>(\x.x) b
+A:
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+
+S4
+Dnull
+Q4
+#Question 4 description
+<4.0
+!
+>(\x.x) b
+A:
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+a -> 	[]
+

@@ -14,6 +14,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
@@ -21,6 +28,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -28,6 +36,10 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 /**
  *
@@ -35,6 +47,8 @@ import javax.swing.WindowConstants;
  */
 public class TutorialInterface extends JFrame implements ActionListener{
     private final String [] REDUCTIONS = {"alpha","beta","eta","conversion"};
+    private Person student;
+
     //component declarations
     
     private JScrollPane welcomeScrollPane;   
@@ -76,7 +90,8 @@ public class TutorialInterface extends JFrame implements ActionListener{
         }
         //</editor-fold>
         
-        //TODO: student sign in
+        signIn();
+        
         setLayout(new BorderLayout());
 
         String welcome = loadWelcomeMessage();
@@ -87,8 +102,15 @@ public class TutorialInterface extends JFrame implements ActionListener{
     
     @SuppressWarnings("unchecked")
     
+    private void signIn(){
+        String studentNumber = JOptionPane.showInputDialog(this, "What is your student number?", JOptionPane.QUESTION_MESSAGE);
+        String studentName = JOptionPane.showInputDialog(this, "What is your name?", JOptionPane.QUESTION_MESSAGE);
+        
+        student = new Student(studentName, studentNumber);
+    }
+    
     private void initComponents() {
-// <editor-fold defaultstate="collapsed" desc="">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="">
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainPanel = new JPanel();
         //mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
@@ -138,22 +160,65 @@ public class TutorialInterface extends JFrame implements ActionListener{
         
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>
     
-    public String loadWelcomeMessage(){
+    private String loadWelcomeMessage(){
+        String welcomeMsg = "WELCOME to Lambda Tutorial"+
+                "\na is for alpha, b is for beta, e is for eta, and c is for conversion (such as from true to ";
         return "WELCOME!";
     }
     
-    public boolean loadQuestions(){
+    private boolean loadQuestions(){
         boolean qLoaded = false;
         //TODO: read questions from txt file
-        questions = new Question[10];
-        questions[0] = new Question("Question 1",10.0,"R");
+        //TODO: select a file to be read
+        String line="", quest="",require="", start="";
+        char firstChar ='a';
+        double mark = 0;
+        int numQ = 0;
+        List<Question> questionList = new ArrayList<>();
+        try {
+            File qFile = new File("questions.txt");
+    		
+            BufferedReader reader=new BufferedReader(new FileReader(qFile));
+            while((line=reader.readLine())!=null){
+            	firstChar = line.charAt(0);
+                //Question starts with '#', mark starts with '>', requirement starts with '!'
+                if (firstChar=='#'){
+                    numQ+=1;
+                    if(numQ>1){
+                        questionList.add(new Question(quest,mark,require,start));
+                    }
+                    quest = line.substring(1);
+                    mark=0;
+                    require="";
+                    start="";
+                }else if(firstChar=='<'){
+                    mark = Double.parseDouble(line.substring(1));
+                }else if(firstChar=='!'){
+                    require = line.substring(1);
+                }else if(firstChar=='>'){
+                    start = line.substring(1);
+                }else{
+                    quest+=" " + line;
+                }
+            }
+            reader.close();
+            questionList.add(new Question(quest,mark,require,start));
+ 
+        } catch (IOException e) {
+            System.err.print("error reading file: " + e.toString());
+        }
+        System.out.println(questionList);
+        questions = questionList.toArray(new Question[numQ]);
+        //questions = new Question[10];
+        /*questions[0] = new Question("Question 1",10.0,"R");
         questions[1] = new Question("Question 2", 20.0,"Associative");
         for (int i = 2;i<10;i++){
             questions[i] = new Question("Question",((int)(Math.random()*10+1)),"None");
         }
         int numQ = questions.length;
+        */
         qPanel = new QuestionPanel[numQ];
         qPane = new JScrollPane[numQ];
         
@@ -170,15 +235,30 @@ public class TutorialInterface extends JFrame implements ActionListener{
         return qLoaded; 
     }
     
-    public void saveSolutions(){
-        //TODO: save solutions to file
+    private void saveSolutions(){
+        
+        //place all solutions in a StringBuilder
+        StringBuilder solutionBuilder = new StringBuilder(((Student)student).getStudentNum());
+        solutionBuilder.append("\n");
         for(int i=0;i<questions.length;i++){
-            solutions[i] = qPanel[i].getSolution();
-            System.out.println(solutions[i]);
-        }
+                solutions[i] = qPanel[i].getSolution();
+                
+                solutionBuilder.append(solutions[i].outputFormat());
+                solutionBuilder.append("\n");
+        }  
+        System.out.println(solutionBuilder.toString());
+        Writer writer;
+        try{	
+            writer = new BufferedWriter(new FileWriter(new File("solutions.txt"), false));	//new writer
+            writer.write(solutionBuilder.toString());//write string
+            writer.close();
+        } catch (IOException ex) {
+            System.err.print("save solutions error: " + ex.toString());
+        } 
+        
     }
     
-    public void submitSolutions(){
+    private void submitSolutions(){
         //TODO: save solutions and close program
         saveSolutions();
     }
@@ -245,7 +325,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         mainPanel.repaint();
     }
     
-    class LinePanel extends JPanel implements KeyListener{
+    class LinePanel extends JPanel{
         private final String [] REDUCTIONS = {"alpha","beta","eta","conversion"};
         private JComboBox reductionBox;
         private JTextField expressionField;
@@ -253,9 +333,12 @@ public class TutorialInterface extends JFrame implements ActionListener{
         public LinePanel(){
             super(new BorderLayout());
             reductionBox = new JComboBox();
-            reductionBox.setModel(new DefaultComboBoxModel(new String[] { "a", "b", "e", "c" }));
+            reductionBox.setModel(new DefaultComboBoxModel(new String[] { "α", "β", "η", "→" }));
             expressionField = new JTextField(50);
             reasonField = new JTextField(30);
+            ((AbstractDocument) expressionField.getDocument()).setDocumentFilter(new Formatter.LambdaFilter());
+            ((AbstractDocument) reasonField.getDocument()).setDocumentFilter(new Formatter.LambdaFilter());
+
             add(reductionBox, BorderLayout.WEST);
             add(expressionField, BorderLayout.CENTER);
             add(reasonField, BorderLayout.EAST);
@@ -267,27 +350,13 @@ public class TutorialInterface extends JFrame implements ActionListener{
             Line line = new Line(expressionField.getText(),reductionChar,reasonField.getText());
             return line;
         }
-        
-        @Override
-        public void keyTyped(KeyEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
     }
         
         
     class QuestionPanel extends JPanel{
         private JScrollPane questionScroll;
         private JTextArea questionArea;
+        private JTextField startField;
         private LinePanel lineP;
         private JButton addLine;
         private Question question;
@@ -300,12 +369,15 @@ public class TutorialInterface extends JFrame implements ActionListener{
             questionScroll = new JScrollPane();
             questionArea.setText("Question " + q.getId() + ": " + q.getDescription() + "\nRequirements: " + q.getRequirements() + "\nMarks: " + q.getMaxMark());
             questionArea.setEditable(false);
+            startField = new JTextField(q.getStart());
+            startField.setEditable(false);
             lineP = new LinePanel();
             addLine = new JButton();
             addLine.setText("Add line");
             questionScroll.setViewportView(questionArea);
             
             add(questionScroll);
+            add(startField);
             add(addLine);
             add(lineP);
             add(new LinePanel());

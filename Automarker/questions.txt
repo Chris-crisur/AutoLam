@@ -1,0 +1,15 @@
+#Question 1 description
+<20.0
+>(\x.x) b
+#Question 2 description
+<12.5
+!Associative
+>(\x.x) b
+#Question 3 description
+which continues to the next line
+<100.0
+!Normal
+>(\x.x) b
+#Question 4 description
+<4
+>(\x.x) b

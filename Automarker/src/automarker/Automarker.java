@@ -24,7 +24,7 @@ public class Automarker {
         Line [] lines = new Line[2];
         lines[0] = new Line("(\\x.x) f", 'a', "x->f");
         lines[1] = new Line("f",'b',"\\x.x/f");
-        solutions[0] = new Solution(new Question("Question 1\n (\\x.x) x", 20.0, "Normal"),lines);
+        solutions[0] = new Solution(new Question("Question 1\n (\\x.x) x", 20.0, "Normal","(\\x.x) x"),lines);
     }
     
     /**

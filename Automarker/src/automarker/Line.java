@@ -75,4 +75,8 @@ public class Line {
         return "Line( "+expression+", " + reduction + ", " + reasoning +")";
     }
     
+    public String outputFormat(){       
+        return reduction + " -> " + expression +  "\t[" + reasoning + "]";
+    }
+    
 }
