@@ -64,9 +64,15 @@ public class Line {
 
     @Override
     public String toString() {
+        return reduction + " -> " + expression +  "\t[" + reasoning + "] (" + mark + ')';
+    }
+    
+    public String toStringTechnical() {
         return "Line{" + "id=" + id + ", expression=" + expression + ", reduction=" + reduction + ", reasoning=" + reasoning + ", mark=" + mark + '}';
     }
     
-    
+    public String toStringCrossTest(){       
+        return "Line( "+expression+", " + reduction + ", " + reasoning +")";
+    }
     
 }

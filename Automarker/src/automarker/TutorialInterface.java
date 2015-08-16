@@ -7,8 +7,16 @@
 package automarker;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -31,10 +39,12 @@ public class TutorialInterface extends JFrame{
     
     private JScrollPane welcomeScrollPane;   
     private JPanel mainPanel;
+    private JScrollPane mainPane;
     private JTextArea welcomeArea;
     private QuestionPanel [] qPanel;
+    private JScrollPane [] qPane;
+    private JButton submit;
     
-    private int incr;
     private Solution [] solutions;
     private Question [] questions;
     
@@ -60,42 +70,62 @@ public class TutorialInterface extends JFrame{
         }
         //</editor-fold>
         
-        //TODO: add welcome message and questions
+        //TODO: student sign in
         setLayout(new BorderLayout());
-        
-        incr=0;
+
         loadQuestions();
-        createSolutions();
+        solutions = new Solution[questions.length];
+        
         String welcome = loadWelcomeMessage();
         initComponents(questions.length);
         setVisible(true);
         
+        
     }
     
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    
     private void initComponents(int numQ) {
-
+// <editor-fold defaultstate="collapsed" desc="">//GEN-BEGIN:initComponents
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
+        
+        mainPane = new JScrollPane(mainPanel);
+        mainPane.setPreferredSize(new Dimension(1920, 1000));
+        
         welcomeScrollPane = new JScrollPane();
         welcomeArea = new JTextArea();
         qPanel = new QuestionPanel[numQ];
+        qPane = new JScrollPane[numQ];
         
+        submit = new JButton("Submit");
+        submit.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                submitSolutions();
+            }
         
-
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        });
+        
 
         welcomeArea.setColumns(20);
         welcomeArea.setRows(5);
         welcomeArea.setText("Welcome to the Lambda Calculus tutorial");
         welcomeScrollPane.setViewportView(welcomeArea);
-
+        
+        mainPanel.add(welcomeScrollPane);
+        
         for (int i=0;i<numQ;i++){
             qPanel[i] = new QuestionPanel(questions[i]);
-            add(qPanel[i]);
+            qPane[i] = new JScrollPane(qPanel[i]);
+            qPane[i].setPreferredSize(new Dimension(500, 400));
+            mainPanel.add(qPane[i]);
         }
+        mainPanel.add(submit);
+        mainPanel.validate();
+        add(mainPane);
         //questionArea.setText("Question 1:\nReduce (\\x.x c) b");
-        
 
         
 
@@ -106,24 +136,34 @@ public class TutorialInterface extends JFrame{
         return "WELCOME!";
     }
     
-    public void createSolutions(){
-        incr+=1;
-        Solution sol = new Solution(getQuestion(incr));
-        
-    }
-    
     public void loadQuestions(){
         //TODO: read questions from txt file
-        questions = new Question[2];
+        questions = new Question[10];
         questions[0] = new Question("Question 1",10.0,"R");
         questions[1] = new Question("Question 2", 20.0,"Associative");
+        for (int i = 2;i<10;i++){
+            questions[i] = new Question("Question",((int)(Math.random()*10+1)),"None");
+        }
+    }
+    
+    public void saveSolutions(){
+        //TODO: save solutions to file
+        for(int i=0;i<questions.length;i++){
+            solutions[i] = qPanel[i].getSolution();
+            System.out.println(solutions[i]);
+        }
+    }
+    
+    public void submitSolutions(){
+        //TODO: save solutions and close program
+        saveSolutions();
     }
     
     private Question getQuestion(int id){
         return questions[id];
     }
     
-    class LinePanel extends JPanel{
+    class LinePanel extends JPanel implements KeyListener{
         private final String [] REDUCTIONS = {"alpha","beta","eta","conversion"};
         private JComboBox reductionBox;
         private JTextField expressionField;
@@ -132,11 +172,33 @@ public class TutorialInterface extends JFrame{
             super(new BorderLayout());
             reductionBox = new JComboBox();
             reductionBox.setModel(new DefaultComboBoxModel(new String[] { "a", "b", "e", "c" }));
-            expressionField = new JTextField();
-            reasonField = new JTextField();
-            add(reductionBox, BorderLayout.PAGE_START);
+            expressionField = new JTextField(50);
+            reasonField = new JTextField(30);
+            add(reductionBox, BorderLayout.WEST);
             add(expressionField, BorderLayout.CENTER);
-            add(reasonField, BorderLayout.PAGE_END);
+            add(reasonField, BorderLayout.EAST);
+        }
+
+        public Line getLine(){
+            String str = (String)reductionBox.getSelectedItem();
+            char reductionChar = str.charAt(0);
+            Line line = new Line(expressionField.getText(),reductionChar,reasonField.getText());
+            return line;
+        }
+        
+        @Override
+        public void keyTyped(KeyEvent e) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
         
@@ -146,29 +208,60 @@ public class TutorialInterface extends JFrame{
         private JTextArea questionArea;
         private LinePanel lineP;
         private JButton addLine;
+        private Question question;
         
         public QuestionPanel(Question q){
-            super(new BorderLayout());
-            System.out.println(q);
+            super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            question = q;
             questionArea = new JTextArea();
             questionArea.setColumns(20);
             questionScroll = new JScrollPane();
             questionArea.setText("Question " + q.getId() + ": " + q.getDescription() + "\nRequirements: " + q.getRequirements() + "\nMarks: " + q.getMaxMark());
+            questionArea.setEditable(false);
             lineP = new LinePanel();
             addLine = new JButton();
             addLine.setText("Add line");
             questionScroll.setViewportView(questionArea);
             
-            add(questionScroll, BorderLayout.PAGE_START);
-            add(lineP, BorderLayout.LINE_END);
-            add(addLine,BorderLayout.PAGE_END);
+            add(questionScroll);
+            add(addLine);
+            add(lineP);
+            add(new LinePanel());
+            add(new LinePanel());
+            add(new LinePanel());
+            add(new LinePanel());
+            add(new LinePanel());
+            add(new LinePanel());
             
             addLine.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
-                    add(new LinePanel(), BorderLayout.LINE_END);
+                    add(new LinePanel());
                 }
             });
         }
+        
+        public Solution getSolution(){
+            int numComp = getComponentCount();
+            Component [] comps = getComponents();
+            int numLines = 0;
+            List<LinePanel> linePanels = new ArrayList<>();
+            for (int i=0;i<numComp;i++){
+                if (comps[i] instanceof LinePanel){
+                    linePanels.add((LinePanel)comps[i]);
+                }
+            }
+            
+            numLines = linePanels.size();
+            
+            Line [] lines = new Line [numLines];
+            for (int i=0;i<numLines;i++){
+                lines[i] = linePanels.get(i).getLine();
+            }
+            
+            Solution sol = new Solution(question, lines);
+            return sol;
+        }
+        
     }
     
 }

@@ -55,9 +55,15 @@ public class Question {
 
     @Override
     public String toString() {
+        return description + "\n\t" + requirements;
+    }
+    
+    public String toStringTechnical() {
         return "Question{" + "id=" + id + ", description=" + description + ", maxMark=" + maxMark + ", requirements=" + requirements + '}';
     }
     
-    
+    public String toStringCrossTest(){
+        return "Question(" + description + ", " +  maxMark + ", "+ requirements + ")";
+    }
     
 }

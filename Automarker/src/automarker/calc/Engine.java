@@ -21,7 +21,7 @@
 /*     */         String str1;
 /*     */         String str2;
 /*  24 */         synchronized (this) {
-/*     */           //continue; //moved below
+/*     */           //continue;
 /*  26 */           try{ 
                         wait();
 /*     */           }
