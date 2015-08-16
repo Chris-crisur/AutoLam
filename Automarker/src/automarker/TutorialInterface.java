@@ -33,7 +33,7 @@ import javax.swing.WindowConstants;
  *
  * @author Chris
  */
-public class TutorialInterface extends JFrame{
+public class TutorialInterface extends JFrame implements ActionListener{
     private final String [] REDUCTIONS = {"alpha","beta","eta","conversion"};
     //component declarations
     
@@ -43,7 +43,13 @@ public class TutorialInterface extends JFrame{
     private JTextArea welcomeArea;
     private QuestionPanel [] qPanel;
     private JScrollPane [] qPane;
+    
     private JButton submit;
+    private JButton next;
+    private JButton upload;
+    private JButton prev;
+    private int qIndex;
+    
     
     private Solution [] solutions;
     private Question [] questions;
@@ -73,56 +79,58 @@ public class TutorialInterface extends JFrame{
         //TODO: student sign in
         setLayout(new BorderLayout());
 
-        loadQuestions();
-        solutions = new Solution[questions.length];
-        
         String welcome = loadWelcomeMessage();
-        initComponents(questions.length);
+        qIndex = -1;
+        initComponents();
         setVisible(true);
-        
-        
     }
     
     @SuppressWarnings("unchecked")
     
-    private void initComponents(int numQ) {
+    private void initComponents() {
 // <editor-fold defaultstate="collapsed" desc="">//GEN-BEGIN:initComponents
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
+        //mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BorderLayout());
         
         mainPane = new JScrollPane(mainPanel);
-        mainPane.setPreferredSize(new Dimension(1920, 1000));
+        mainPane.setPreferredSize(new Dimension(1440, 400));
         
         welcomeScrollPane = new JScrollPane();
         welcomeArea = new JTextArea();
-        qPanel = new QuestionPanel[numQ];
-        qPane = new JScrollPane[numQ];
+        
+        upload = new JButton("Upload");
+        upload.addActionListener(this);
+        upload.setActionCommand("UPLOAD");
+        
+        next = new JButton("Next");
+        next.addActionListener(this);
+        next.setActionCommand("NEXT");
+        
+        prev = new JButton("Previous");
+        prev.addActionListener(this);
+        prev.setActionCommand("PREVIOUS");
         
         submit = new JButton("Submit");
-        submit.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                submitSolutions();
-            }
-        
-        });
-        
+        submit.addActionListener(this);
+        submit.setActionCommand("SUBMIT");
 
         welcomeArea.setColumns(20);
         welcomeArea.setRows(5);
         welcomeArea.setText("Welcome to the Lambda Calculus tutorial");
+        welcomeArea.setEditable(false);
         welcomeScrollPane.setViewportView(welcomeArea);
         
-        mainPanel.add(welcomeScrollPane);
+        mainPanel.add(welcomeScrollPane, BorderLayout.CENTER);
         
-        for (int i=0;i<numQ;i++){
-            qPanel[i] = new QuestionPanel(questions[i]);
-            qPane[i] = new JScrollPane(qPanel[i]);
-            qPane[i].setPreferredSize(new Dimension(500, 400));
-            mainPanel.add(qPane[i]);
-        }
-        mainPanel.add(submit);
+        //mainPanel.add(submit);
+        
+        mainPanel.add(upload,BorderLayout.EAST);
+        
+        prev.setEnabled(false);
+        mainPanel.add(prev,BorderLayout.WEST);
+        
         mainPanel.validate();
         add(mainPane);
         //questionArea.setText("Question 1:\nReduce (\\x.x c) b");
@@ -136,7 +144,8 @@ public class TutorialInterface extends JFrame{
         return "WELCOME!";
     }
     
-    public void loadQuestions(){
+    public boolean loadQuestions(){
+        boolean qLoaded = false;
         //TODO: read questions from txt file
         questions = new Question[10];
         questions[0] = new Question("Question 1",10.0,"R");
@@ -144,6 +153,21 @@ public class TutorialInterface extends JFrame{
         for (int i = 2;i<10;i++){
             questions[i] = new Question("Question",((int)(Math.random()*10+1)),"None");
         }
+        int numQ = questions.length;
+        qPanel = new QuestionPanel[numQ];
+        qPane = new JScrollPane[numQ];
+        
+        for (int i=0;i<numQ;i++){
+            qPanel[i] = new QuestionPanel(questions[i]);
+            qPane[i] = new JScrollPane(qPanel[i]);
+            //qPane[i].setPreferredSize(new Dimension(500, 400));
+            //mainPanel.add(qPane[i]);
+        }
+        
+        solutions = new Solution[numQ];
+        
+        qLoaded = true; //questions loaded succesfully
+        return qLoaded; 
     }
     
     public void saveSolutions(){
@@ -161,6 +185,64 @@ public class TutorialInterface extends JFrame{
     
     private Question getQuestion(int id){
         return questions[id];
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String action = e.getActionCommand();
+        if(action.equals("SUBMIT")){
+            submitSolutions();
+        }else if(action.equals("NEXT")){
+            nextQuestion();
+        }else if(action.equals("PREVIOUS")){
+            previousQuestion();
+        }else if(action.equals("UPLOAD")){
+            boolean result = loadQuestions();
+            if(result){
+                mainPanel.remove(upload);
+                mainPanel.add(next,BorderLayout.EAST);
+                nextQuestion();
+            }else{
+                welcomeArea.append("Error loading questions");
+            }
+        }
+        
+    }
+
+    private void nextQuestion() {
+        if(qIndex<0){
+            mainPanel.remove(welcomeScrollPane);
+        }else{
+            mainPanel.remove(qPane[qIndex]);
+        }
+        qIndex+=1;
+        if (qIndex >= questions.length){
+            next.setEnabled(false);
+            mainPanel.add(submit, BorderLayout.CENTER);
+        }else{
+            mainPanel.add(qPane[qIndex], BorderLayout.CENTER);
+            prev.setEnabled(true);
+        }
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    private void previousQuestion() {
+        if(qIndex>=questions.length){
+            mainPanel.remove(submit);
+        }else{
+            mainPanel.remove(qPane[qIndex]);
+        }
+        qIndex-=1;
+        if (qIndex < 0){
+            prev.setEnabled(false);
+            mainPanel.add(welcomeScrollPane, BorderLayout.CENTER);
+        }else{
+            mainPanel.add(qPane[qIndex], BorderLayout.CENTER);
+            next.setEnabled(true);
+        }
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
     
     class LinePanel extends JPanel implements KeyListener{
