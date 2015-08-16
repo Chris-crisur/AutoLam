@@ -20,6 +20,8 @@ public class Formatter {
         public void insertString(DocumentFilter.FilterBypass fb, int length, String text, AttributeSet attr) throws BadLocationException
         {
             text=text.replace('\\', 'λ');
+            //text=text.replace("(", "()");
+            //text=text.replace("[", "[]");
             super.insertString(fb, length, text, attr);
         }
         
@@ -27,6 +29,8 @@ public class Formatter {
         public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attr) throws BadLocationException
         {
             text=text.replace('\\', 'λ');
+            //text=text.replace("(", "()");
+            //text=text.replace("[", "[]");
             super.replace(fb, offset, length, text, attr);
         }
     }

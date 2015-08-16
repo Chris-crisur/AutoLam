@@ -64,7 +64,6 @@ public class TutorialInterface extends JFrame implements ActionListener{
     private JButton prev;
     private int qIndex;
     
-    
     private Solution [] solutions;
     private Question [] questions;
     
@@ -96,7 +95,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
 
         String welcome = loadWelcomeMessage();
         qIndex = -1;
-        initComponents();
+        initComponents(welcome);
         setVisible(true);
     }
     
@@ -109,7 +108,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         student = new Student(studentName, studentNumber);
     }
     
-    private void initComponents() {
+    private void initComponents(String welcome) {
     // <editor-fold defaultstate="collapsed" desc="">
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainPanel = new JPanel();
@@ -140,7 +139,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
 
         welcomeArea.setColumns(20);
         welcomeArea.setRows(5);
-        welcomeArea.setText("Welcome to the Lambda Calculus tutorial");
+        welcomeArea.setText(welcome);
         welcomeArea.setEditable(false);
         welcomeScrollPane.setViewportView(welcomeArea);
         
@@ -165,7 +164,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
     private String loadWelcomeMessage(){
         String welcomeMsg = "WELCOME to Lambda Tutorial"+
                 "\na is for alpha, b is for beta, e is for eta, and c is for conversion (such as from true to ";
-        return "WELCOME!";
+        return welcomeMsg;
     }
     
     private boolean loadQuestions(){
@@ -183,7 +182,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
             BufferedReader reader=new BufferedReader(new FileReader(qFile));
             while((line=reader.readLine())!=null){
             	firstChar = line.charAt(0);
-                //Question starts with '#', mark starts with '>', requirement starts with '!'
+                //Question starts with '#', mark starts with '<', requirement starts with '!', start expression starts with '>'
                 if (firstChar=='#'){
                     numQ+=1;
                     if(numQ>1){
@@ -266,7 +265,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
     private Question getQuestion(int id){
         return questions[id];
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
@@ -288,7 +287,8 @@ public class TutorialInterface extends JFrame implements ActionListener{
         }
         
     }
-
+    
+    //cannot go above or below number of questions
     private void nextQuestion() {
         if(qIndex<0){
             mainPanel.remove(welcomeScrollPane);
@@ -343,7 +343,37 @@ public class TutorialInterface extends JFrame implements ActionListener{
             add(expressionField, BorderLayout.CENTER);
             add(reasonField, BorderLayout.EAST);
         }
-
+        
+        public boolean checkLine(){
+            String expression = expressionField.getText();
+            char [] expressionChar = expression.toCharArray();
+            int numP=0; //parenthesis
+            int numC=0; //curly bracket
+            int numH=0; //hard bracket
+            for (int i=0;i<expressionChar.length;i++ ){
+                if(expressionChar[i]=='('){
+                    numP+=1;
+                }else if(expressionChar[i]==')'){
+                    numP-=1;
+                }else if(expressionChar[i]=='{'){
+                    numC+=1;
+                }else if(expressionChar[i]=='}'){
+                    numC-=1;
+                }else if(expressionChar[i]=='['){
+                    numH+=1;
+                }else if(expressionChar[i]==']'){
+                    numH-=1;
+                }
+            }
+            
+            if (numP!=0 || numC!=0 || numH!=0 ){
+                return false;
+            }else{
+                return true;
+            }
+              
+        }
+        
         public Line getLine(){
             String str = (String)reductionBox.getSelectedItem();
             char reductionChar = str.charAt(0);
@@ -359,6 +389,8 @@ public class TutorialInterface extends JFrame implements ActionListener{
         private JTextField startField;
         private LinePanel lineP;
         private JButton addLine;
+        private JButton parserB;
+        private JTextField parseResult;
         private Question question;
         
         public QuestionPanel(Question q){
@@ -372,13 +404,25 @@ public class TutorialInterface extends JFrame implements ActionListener{
             startField = new JTextField(q.getStart());
             startField.setEditable(false);
             lineP = new LinePanel();
+            
+            JPanel extra = new JPanel(new FlowLayout());
+            
             addLine = new JButton();
             addLine.setText("Add line");
+            parserB = new JButton("Parse lines");
+            parseResult = new JTextField(10);
+            parseResult.setText("formatting ");
+            
             questionScroll.setViewportView(questionArea);
             
             add(questionScroll);
             add(startField);
-            add(addLine);
+            
+            extra.add(addLine);
+            extra.add(parserB);
+            extra.add(parseResult);
+            add(extra);
+            
             add(lineP);
             add(new LinePanel());
             add(new LinePanel());
@@ -388,10 +432,36 @@ public class TutorialInterface extends JFrame implements ActionListener{
             add(new LinePanel());
             
             addLine.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     add(new LinePanel());
                 }
             });
+            parserB.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    if(checkFormat()){
+                        parseResult.setText("formatting good");
+                    }else{
+                        parseResult.setText("errors exist");
+                    }
+                }
+            });
+        
+        }
+        
+        
+        public boolean checkFormat(){
+            int numComp = getComponentCount();
+            Component [] comps = getComponents();
+            for (int i=0;i<numComp;i++){
+                if (comps[i] instanceof LinePanel){
+                    if(!((LinePanel)comps[i]).checkLine()){
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
         
         public Solution getSolution(){
