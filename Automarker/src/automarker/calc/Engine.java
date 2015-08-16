@@ -159,7 +159,7 @@
 /* 173 */       if (arrayOfExpr[k] != null) {
 /* 174 */         localHashSet.remove(arrayOfExpr[k]);
 /*     */       }
-/* 176 */       arrayOfExpr[k] = localObject1;
+/* 176 */       arrayOfExpr[k] = (Expr)localObject1;
 /* 177 */       localHashSet.add(localExprWrapper);
 /* 178 */       if (n < j) {
 /* 179 */         localObject3 = localObject1;

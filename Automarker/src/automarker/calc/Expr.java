@@ -1,4 +1,4 @@
-/*     */ package lambda;
+/*     */ package automarker.calc;
 /*     */ 
 /*     */ import java.util.HashSet;
 /*     */ 
