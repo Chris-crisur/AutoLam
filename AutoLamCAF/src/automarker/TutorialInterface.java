@@ -7,6 +7,7 @@
 package automarker;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -23,11 +24,13 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -40,6 +43,8 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
+
+//import automarker.StudentTutorial.LinePanel.MyInputListener;
 
 /**
  *
@@ -64,8 +69,10 @@ public class TutorialInterface extends JFrame implements ActionListener{
     private JButton prev;
     private int qIndex;
     
+    
     private Solution [] solutions;
     private Question [] questions;
+    private javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
     
     public static void main(String [] args){
         TutorialInterface TI = new TutorialInterface();
@@ -95,7 +102,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
 
         String welcome = loadWelcomeMessage();
         qIndex = -1;
-        initComponents(welcome);
+        initComponents();
         setVisible(true);
     }
     
@@ -108,7 +115,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         student = new Student(studentName, studentNumber);
     }
     
-    private void initComponents(String welcome) {
+    private void initComponents() {
     // <editor-fold defaultstate="collapsed" desc="">
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainPanel = new JPanel();
@@ -129,7 +136,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         next.addActionListener(this);
         next.setActionCommand("NEXT");
         
-        prev = new JButton("Previous");
+        prev = new JButton("Back");
         prev.addActionListener(this);
         prev.setActionCommand("PREVIOUS");
         
@@ -139,7 +146,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
 
         welcomeArea.setColumns(20);
         welcomeArea.setRows(5);
-        welcomeArea.setText(welcome);
+        welcomeArea.setText("Welcome to the Lambda Calculus tutorial");
         welcomeArea.setEditable(false);
         welcomeScrollPane.setViewportView(welcomeArea);
         
@@ -164,10 +171,10 @@ public class TutorialInterface extends JFrame implements ActionListener{
     private String loadWelcomeMessage(){
         String welcomeMsg = "WELCOME to Lambda Tutorial"+
                 "\na is for alpha, b is for beta, e is for eta, and c is for conversion (such as from true to ";
-        return welcomeMsg;
+        return "WELCOME!";
     }
     
-    private boolean loadQuestions(){
+    private boolean loadQuestions(String txtFile){
         boolean qLoaded = false;
         //TODO: read questions from txt file
         //TODO: select a file to be read
@@ -177,12 +184,12 @@ public class TutorialInterface extends JFrame implements ActionListener{
         int numQ = 0;
         List<Question> questionList = new ArrayList<>();
         try {
-            File qFile = new File("questions.txt");
+            File qFile = new File(txtFile);
     		
             BufferedReader reader=new BufferedReader(new FileReader(qFile));
             while((line=reader.readLine())!=null){
             	firstChar = line.charAt(0);
-                //Question starts with '#', mark starts with '<', requirement starts with '!', start expression starts with '>'
+                //Question starts with '#', mark starts with '>', requirement starts with '!'
                 if (firstChar=='#'){
                     numQ+=1;
                     if(numQ>1){
@@ -204,8 +211,10 @@ public class TutorialInterface extends JFrame implements ActionListener{
             }
             reader.close();
             questionList.add(new Question(quest,mark,require,start));
+            qLoaded = true; //questions loaded succesfully
  
         } catch (IOException e) {
+        	welcomeArea.setText("Error occured while loading the file:"+e.toString());
             System.err.print("error reading file: " + e.toString());
         }
         System.out.println(questionList);
@@ -230,7 +239,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         
         solutions = new Solution[numQ];
         
-        qLoaded = true; //questions loaded succesfully
+       
         return qLoaded; 
     }
     
@@ -251,6 +260,8 @@ public class TutorialInterface extends JFrame implements ActionListener{
             writer = new BufferedWriter(new FileWriter(new File("solutions.txt"), false));	//new writer
             writer.write(solutionBuilder.toString());//write string
             writer.close();
+            JOptionPane.showMessageDialog(this, "Find the output textfile in you current working directory.");
+            initComponents();
         } catch (IOException ex) {
             System.err.print("save solutions error: " + ex.toString());
         } 
@@ -265,7 +276,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
     private Question getQuestion(int id){
         return questions[id];
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
@@ -276,19 +287,20 @@ public class TutorialInterface extends JFrame implements ActionListener{
         }else if(action.equals("PREVIOUS")){
             previousQuestion();
         }else if(action.equals("UPLOAD")){
-            boolean result = loadQuestions();
+        	int i = chooser.showOpenDialog(this);
+        	if(i== chooser.APPROVE_OPTION){
+            boolean result = loadQuestions(chooser.getSelectedFile().getPath());
             if(result){
                 mainPanel.remove(upload);
                 mainPanel.add(next,BorderLayout.EAST);
                 nextQuestion();
             }else{
                 welcomeArea.append("Error loading questions");
-            }
+            }}
         }
         
     }
-    
-    //cannot go above or below number of questions
+
     private void nextQuestion() {
         if(qIndex<0){
             mainPanel.remove(welcomeScrollPane);
@@ -330,69 +342,48 @@ public class TutorialInterface extends JFrame implements ActionListener{
         private JComboBox reductionBox;
         private JTextField expressionField;
         private JTextField reasonField;
+        private javax.swing.JLabel jLabel1;
+        
         public LinePanel(){
             super(new BorderLayout());
             reductionBox = new JComboBox();
             reductionBox.setModel(new DefaultComboBoxModel(new String[] { "α", "β", "η", "→" }));
             expressionField = new JTextField(50);
+            expressionField.addActionListener(new MyInputListener());
             reasonField = new JTextField(30);
+            jLabel1 = new JLabel(" ");
+            jLabel1.setForeground(Color.red);
             ((AbstractDocument) expressionField.getDocument()).setDocumentFilter(new Formatter.LambdaFilter());
             ((AbstractDocument) reasonField.getDocument()).setDocumentFilter(new Formatter.LambdaFilter());
 
             add(reductionBox, BorderLayout.WEST);
             add(expressionField, BorderLayout.CENTER);
             add(reasonField, BorderLayout.EAST);
+            add(jLabel1,BorderLayout.SOUTH);
         }
-        
-        public String checkLine(){
-            String expression = expressionField.getText();
-            boolean parsed = false;
-            String result = "";
-            try{
-                Parser.parse(expression);
-                parsed = true;
-                result = "GOOD";
-            }catch(Parser.ParseException pe){
-                result = pe.getMessage();
-                System.out.println(pe);
-                System.err.println(pe);
-                //parsed = false;
-            }
-            /*char [] expressionChar = expression.toCharArray();
-            int numP=0; //parenthesis
-            int numC=0; //curly bracket
-            int numH=0; //hard bracket
-            for (int i=0;i<expressionChar.length;i++ ){
-                if(expressionChar[i]=='('){
-                    numP+=1;
-                }else if(expressionChar[i]==')'){
-                    numP-=1;
-                }else if(expressionChar[i]=='{'){
-                    numC+=1;
-                }else if(expressionChar[i]=='}'){
-                    numC-=1;
-                }else if(expressionChar[i]=='['){
-                    numH+=1;
-                }else if(expressionChar[i]==']'){
-                    numH-=1;
-                }
-            }
-            
-            if (numP!=0 || numC!=0 || numH!=0 ){
-                return false;
-            }else{
-                return true;
-            }
-             */ 
-            return result;
-        }
-        
+
         public Line getLine(){
             String str = (String)reductionBox.getSelectedItem();
             char reductionChar = str.charAt(0);
             Line line = new Line(expressionField.getText(),reductionChar,reasonField.getText());
             return line;
         }
+        private class MyInputListener implements java.awt.event.ActionListener { 
+        	/*     */
+        	/* 160 */     public void actionPerformed(ActionEvent paramActionEvent) { 
+        	               // System.err.println("Action caught!");
+        	/* 161 */       String str2 = expressionField.getText();
+        	                try{
+        	               //     System.err.println("About to parse...");
+        	/* 162 */       Parser.parse(str2);}
+        	                catch (Parser.ParseException exception)
+        	                {
+        	                //    System.err.println("Exception caught!");
+        	                    jLabel1.setText(exception.getMessage());
+        	                }
+        	/* 163 */      
+        	/*     */     }
+        	/*     */   }
     }
         
         
@@ -402,8 +393,6 @@ public class TutorialInterface extends JFrame implements ActionListener{
         private JTextField startField;
         private LinePanel lineP;
         private JButton addLine;
-        private JButton parserB;
-        private JTextField parseResult;
         private Question question;
         
         public QuestionPanel(Question q){
@@ -417,25 +406,13 @@ public class TutorialInterface extends JFrame implements ActionListener{
             startField = new JTextField(q.getStart());
             startField.setEditable(false);
             lineP = new LinePanel();
-            
-            JPanel extra = new JPanel(new FlowLayout());
-            
             addLine = new JButton();
             addLine.setText("Add line");
-            parserB = new JButton("Parse lines");
-            parseResult = new JTextField(30);
-            parseResult.setText("formatting ");
-            
             questionScroll.setViewportView(questionArea);
             
             add(questionScroll);
             add(startField);
-            
-            extra.add(addLine);
-            extra.add(parserB);
-            extra.add(parseResult);
-            add(extra);
-            
+            add(addLine);
             add(lineP);
             add(new LinePanel());
             add(new LinePanel());
@@ -445,40 +422,10 @@ public class TutorialInterface extends JFrame implements ActionListener{
             add(new LinePanel());
             
             addLine.addActionListener(new ActionListener() {
-                @Override
                 public void actionPerformed(ActionEvent evt) {
                     add(new LinePanel());
                 }
             });
-            parserB.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent evt) {
-                    String result = checkFormat();
-                    if(result.equals("GOOD")){
-                        parseResult.setText("formatting good");
-                    }else if(result.contains("Unexpected token")){
-                        parseResult.setText("formatting good");
-                    }else{
-                        parseResult.setText(result);
-                    }
-                }
-            });
-        
-        }
-        
-        
-        public String checkFormat(){
-            int numComp = getComponentCount();
-            Component [] comps = getComponents();
-            for (int i=0;i<numComp;i++){
-                if (comps[i] instanceof LinePanel){
-                    String result = ((LinePanel)comps[i]).checkLine();
-                    if(result.equals("GOOD"))
-                        continue;
-                    return result;
-                }
-            }
-            return "GOOD";
         }
         
         public Solution getSolution(){

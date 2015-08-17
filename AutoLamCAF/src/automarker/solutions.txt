@@ -1,0 +1,68 @@
+3
+S1
+Dnull
+Q1
+#Question 1 description
+<20.0
+!
+>(\x.x) b
+A:
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> bkjkjnjm (k,j)	[]
+α -> 	[]
+α -> 	[]
+
+S2
+Dnull
+Q2
+#Question 2 description
+<12.5
+!Associative
+>(\x.x) b
+A:
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+
+S3
+Dnull
+Q3
+#Question 3 description which continues to the next line
+<100.0
+!Normal
+>(\x.x) b
+A:
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+
+S4
+Dnull
+Q4
+#Question 4 description
+<4.0
+!
+>(\x.x) b
+A:
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+α -> 	[]
+
