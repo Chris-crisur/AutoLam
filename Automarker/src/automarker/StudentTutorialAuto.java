@@ -62,6 +62,7 @@ public class StudentTutorialAuto extends javax.swing.JFrame {
         reductionBox = new javax.swing.JComboBox();
         expressionField = new javax.swing.JTextField();
         reasonField = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
         addLine = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -78,15 +79,33 @@ public class StudentTutorialAuto extends javax.swing.JFrame {
 
         reductionBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "a", "b", "e", "c" }));
 
+        expressionField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                expressionFieldMouseExited(evt);
+            }
+        });
+        expressionField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                validate(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel1.setName("lblErr");
+
         javax.swing.GroupLayout linePanelLayout = new javax.swing.GroupLayout(linePanel);
         linePanel.setLayout(linePanelLayout);
         linePanelLayout.setHorizontalGroup(
             linePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(linePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(reductionBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(expressionField, javax.swing.GroupLayout.PREFERRED_SIZE, 653, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(linePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1)
+                    .addGroup(linePanelLayout.createSequentialGroup()
+                        .addComponent(reductionBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(expressionField, javax.swing.GroupLayout.PREFERRED_SIZE, 653, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(reasonField, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
                 .addContainerGap())
@@ -99,6 +118,8 @@ public class StudentTutorialAuto extends javax.swing.JFrame {
                     .addComponent(reductionBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(expressionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(reasonField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
                 .addContainerGap())
         );
 
@@ -143,7 +164,7 @@ public class StudentTutorialAuto extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(questionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(129, Short.MAX_VALUE))
+                .addContainerGap(123, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -168,6 +189,20 @@ public class StudentTutorialAuto extends javax.swing.JFrame {
 
     }//GEN-LAST:event_addLineActionPerformed
 
+    private void validate(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_validate
+          try {
+            System.out.println("here!");
+            Expr expr = Parser.parse(expressionField.getText());
+        }
+        catch (Parser.ParseException var9_9) {
+        	System.out.println(var9_9.getMessage());
+            jLabel1.setText(var9_9.getMessage());}
+    }//GEN-LAST:event_validate
+
+    private void expressionFieldMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_expressionFieldMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_expressionFieldMouseExited
+
     /**
      * @param args the command line arguments
      *
@@ -185,6 +220,7 @@ public class StudentTutorialAuto extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addLine;
     private javax.swing.JTextField expressionField;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel linePanel;

@@ -25,6 +25,8 @@ public class StudentTutorial extends JFrame {
     private JPanel mainPanel;
     private JTextArea welcomeArea;
     private QuestionPanel [] qPanel;
+    private Context context = new Context();
+   // private Engine engine = new Engine(this);
     
     public StudentTutorial(Question [] questions) {
         /* Set the Nimbus look and feel */
@@ -102,16 +104,37 @@ public class StudentTutorial extends JFrame {
         private JComboBox reductionBox;
         private JTextField expressionField;
         private JTextField reasonField;
+        private javax.swing.JLabel jLabel1;
         public LinePanel(){
             super(new BorderLayout());
             reductionBox = new JComboBox();
             reductionBox.setModel(new DefaultComboBoxModel(new String[] { "a", "b", "e", "c" }));
             expressionField = new JTextField();
+            expressionField.addActionListener(new MyInputListener());
             reasonField = new JTextField();
+            jLabel1 = new JLabel(" ");
+            jLabel1.setForeground(Color.red);
             add(reductionBox, BorderLayout.PAGE_START);
             add(expressionField, BorderLayout.CENTER);
             add(reasonField, BorderLayout.PAGE_END);
+            add(jLabel1);
         }
+        private class MyInputListener implements java.awt.event.ActionListener { 
+/*     */
+/* 160 */     public void actionPerformed(ActionEvent paramActionEvent) { 
+                System.err.println("Action caught!");
+/* 161 */       String str2 = expressionField.getText();
+                try{
+                    System.err.println("About to parse...");
+/* 162 */       Parser.parse(str2);}
+                catch (Parser.ParseException exception)
+                {
+                    System.err.println("Exception caught!");
+                    jLabel1.setText(exception.getMessage());
+                }
+/* 163 */      
+/*     */     }
+/*     */   }
     }
         
         
@@ -139,6 +162,7 @@ public class StudentTutorial extends JFrame {
             
             addLine.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
+                    System.err.println("Action recognized!");
                     add(new LinePanel(), BorderLayout.LINE_END);
                 }
             });
