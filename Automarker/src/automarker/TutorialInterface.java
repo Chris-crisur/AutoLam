@@ -176,8 +176,8 @@ public class TutorialInterface extends JFrame implements ActionListener{
     
     private boolean loadQuestions(String txtFile){
         boolean qLoaded = false;
-        //TODO: read questions from txt file
-        //TODO: select a file to be read
+        //read questions from txt file
+        //select a file to be read
         String line="", quest="",require="", start="";
         char firstChar ='a';
         double mark = 0;
@@ -227,6 +227,8 @@ public class TutorialInterface extends JFrame implements ActionListener{
         }
         int numQ = questions.length;
         */
+        
+        //load questions into QuestionPanel and that into JScrollPane
         qPanel = new QuestionPanel[numQ];
         qPane = new JScrollPane[numQ];
         
@@ -245,7 +247,8 @@ public class TutorialInterface extends JFrame implements ActionListener{
     
     private void saveSolutions(){
         
-        //place all solutions in a StringBuilder
+        //place all solutions in a StringBuilder (useing outputFormat method of Solution)
+        //save StringBuilder variable to file
         StringBuilder solutionBuilder = new StringBuilder(((Student)student).getStudentNum());
         solutionBuilder.append("\n");
         for(int i=0;i<questions.length;i++){
@@ -261,7 +264,6 @@ public class TutorialInterface extends JFrame implements ActionListener{
             writer.write(solutionBuilder.toString());//write string
             writer.close();
             JOptionPane.showMessageDialog(this, "Find the output textfile in you current working directory.");
-            initComponents();
         } catch (IOException ex) {
             System.err.print("save solutions error: " + ex.toString());
         } 
@@ -273,10 +275,6 @@ public class TutorialInterface extends JFrame implements ActionListener{
         saveSolutions();
     }
     
-    private Question getQuestion(int id){
-        return questions[id];
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
@@ -287,17 +285,29 @@ public class TutorialInterface extends JFrame implements ActionListener{
         }else if(action.equals("PREVIOUS")){
             previousQuestion();
         }else if(action.equals("UPLOAD")){
-        	int i = chooser.showOpenDialog(this);
-        	if(i== chooser.APPROVE_OPTION){
+            boolean chris = true; //TODO: take out later
+            if (!chris){
+                int i = chooser.showOpenDialog(this);
+                if(i== chooser.APPROVE_OPTION){
                     boolean result = loadQuestions(chooser.getSelectedFile().getPath());
                     if(result){
-                        mainPanel.remove(upload);
+                        mainPanel.remove(upload);   //next replaces upload button
                         mainPanel.add(next,BorderLayout.EAST);
                         nextQuestion();
                     }else{
                         welcomeArea.append("Error loading questions");
                     }
                 }
+            }else{
+                boolean result = loadQuestions("questions.txt");
+                    if(result){
+                        mainPanel.remove(upload);   //next replaces upload button
+                        mainPanel.add(next,BorderLayout.EAST);
+                        nextQuestion();
+                    }else{
+                        welcomeArea.append("Error loading questions");
+                    }
+            }
         }
         
     }
@@ -312,6 +322,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         if (qIndex >= questions.length){
             next.setEnabled(false);
             mainPanel.add(submit, BorderLayout.CENTER);
+            //qIndex-=1;
         }else{
             mainPanel.add(qPane[qIndex], BorderLayout.CENTER);
             prev.setEnabled(true);
@@ -321,7 +332,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
     }
 
     private void previousQuestion() {
-        if(qIndex>=questions.length){
+        if(qIndex>=questions.length-1){
             mainPanel.remove(submit);
         }else{
             mainPanel.remove(qPane[qIndex]);

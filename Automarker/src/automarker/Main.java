@@ -1,7 +1,5 @@
-/*    */ package automarker.calc;
+/*    */ package automarker;
 /*    */ 
-import java.io.File;
-import java.io.IOException;
 /*    */ import java.io.PrintStream;
 /*    */ 
 /*    */ public class Main
@@ -15,7 +13,7 @@ import java.io.IOException;
 /* 13 */       for (int i = 0; i < paramArrayOfString.length; i++) {
 /* 14 */         if (paramArrayOfString[i] != null) {
 /*    */           try {
-/* 16 */             File localFile = new File(paramArrayOfString[i]);
+/* 16 */             java.io.File localFile = new java.io.File(paramArrayOfString[i]);
 /* 17 */             if (!localFile.canRead()) {
 /* 18 */               System.err.println("cannot open file \"" + paramArrayOfString[i] + "\"");
 /*    */               
@@ -24,7 +22,7 @@ import java.io.IOException;
 /*    */             }
 /* 23 */             if (localGui == null) localGui = new Gui();
 /* 24 */             localGui.getContext().importFile(localFile);
-/*    */           } catch (IOException localIOException) {
+/*    */           } catch (java.io.IOException localIOException) {
 /* 26 */             System.err.println("error loading " + paramArrayOfString[i] + ":");
 /* 27 */             System.err.println("  " + localIOException);
 /* 28 */             System.err.println();
