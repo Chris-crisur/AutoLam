@@ -1,4 +1,4 @@
 # AutoLam
 Auto Lambda Calculus Marker
  
- this is the first day
+A student interface for entering lambda expressions and a tutor interface for marking said expressions.
