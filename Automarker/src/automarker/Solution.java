@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class Solution {
     private static int idCount = 0;
-    
+
     private int id;
     private Question question;
     private Line [] lines;
@@ -31,11 +31,11 @@ public class Solution {
         dateCreated = "date"; //System.getTimeInMillis();
         mark=0;
     }
-    
+
     public int getID(){
         return id;
     }
-    
+
     public Question getQuestion() {
         return question;
     }
@@ -49,12 +49,12 @@ public class Solution {
     }
 
     //pos=-1 for end position
-    public void addLine(Line line, int pos){ 
+    public void addLine(Line line, int pos){
         Line [] newLines = new Line[lines.length+1];
         if (pos==-1){
            for (int i=0;i<lines.length;i++){
                 newLines[i] = lines[i];
-            } 
+            }
         }else{
             int ind = 0;
             for (int i=0;i<lines.length+1;i++){
@@ -66,9 +66,9 @@ public class Solution {
                 ind+=1;
             }
         }
-        
+
     }
-    
+
     public void setLines(Line []lines) {
         this.lines = lines;
     }
@@ -88,21 +88,21 @@ public class Solution {
     public void setDateSubmitted(String dateSubmitted) {
         this.dateSubmitted = dateSubmitted;
     }
-    
+
     public void setMark(){
         for (Line line : lines) {
             mark+=line.getMark();
         }
     }
-    
+
     public double getMark(){
         return mark;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Solution " + id +  
+        sb.append("Solution " + id +
                 "\nDate Created: " + dateCreated +
                 "\nDate Submitted: " + dateSubmitted +
                 "\nQuestion: " + question.toString() +
@@ -113,14 +113,14 @@ public class Solution {
         sb.append("Final mark: ").append(mark).append(" out of ").append(question.getMaxMark());
         return sb.toString();
     }
-    
+
     public String toStringTechnical(){
         return "Solution{" + "id=" + id + ", question=" + question + ", lines=" + lines + ", dateCreated=" + dateCreated + ", dateSubmitted=" + dateSubmitted + '}';
     }
-    
+
     public String outputFormat(){
         StringBuilder sb = new StringBuilder();
-        sb.append("S" + id +  
+        sb.append("S" + id +
                 "\nD" + dateSubmitted +
                 "\nQ" + question.outputFormat() +
                 "\nA:\n");
@@ -129,5 +129,5 @@ public class Solution {
         }
         return sb.toString();
     }
-    
+
 }
