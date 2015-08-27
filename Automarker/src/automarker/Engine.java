@@ -19,19 +19,22 @@ class Engine {
     Engine(Gui gui) {
         this.gui = gui;
     }
-
-    void addDefinition(String string) {
-        process(string);
+    
+    Engine() {
+    }
+    
+    ArrayList<Expr> addDefinition(String string) {
+        return process(string);
 
     }
 
     private ArrayList<Expr> process(String string) {
         Expr expr;
-        JTextArea jTextArea = this.gui.getOutputArea();
-        Context context = this.gui.getContext();
-        Context context2 = null;
+        //JTextArea jTextArea = this.gui.getOutputArea();
+       // Context context = this.gui.getContext();
+        Context context = new Context();
         if (Options.getSubstituteSymbolsOption().getValue()) {
-            context2 = context;
+            //context2 = context;
         }
         boolean bl = Options.getVaryParenthesesOption().getValue();
         boolean bl2 = Options.getShowIntermediateOption().getValue();
@@ -40,7 +43,7 @@ class Engine {
             expr = Parser.parse(string);
         } catch (Parser.ParseException var9_9) {
             System.out.println(var9_9.getMessage());
-            jTextArea.setText(var9_9.getMessage());
+            //jTextArea.setText(var9_9.getMessage());
             return null;
         }
 
@@ -66,7 +69,7 @@ class Engine {
             int n5 = expr.size();
             ExprWrapper exprWrapper = new ExprWrapper(expr);
             if (++n4 > Options.getMaxReductionsOption().getValue() || hashSet.contains(exprWrapper)) {
-                jTextArea.append("\n   = ... ");
+                //jTextArea.append("\n   = ... ");
                 expr = expr3;
 
                 expressions.add(expr);
@@ -91,10 +94,10 @@ class Engine {
         }
 
         //display list of expressions
-        System.out.println("list of expr:");
-        for (int i = 0; i < expressions.size(); i++) {
-            System.out.println(expressions.get(i));
-        }
+        //System.out.println("list of expr:");
+        //for (int i = 0; i < expressions.size(); i++) {
+        //    System.out.println(expressions.get(i));
+        //}
         return expressions;
     }
 
