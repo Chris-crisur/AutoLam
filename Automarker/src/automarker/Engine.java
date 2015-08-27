@@ -6,6 +6,7 @@ package automarker;
 
 
 import automarker.Context;
+import java.util.ArrayList;
 import java.util.HashSet;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -14,6 +15,7 @@ import javax.swing.JTextArea;
 class Engine {
 
     private Gui gui;
+    private ArrayList<Expr> expressions;
   
     //private Runner runner = null;
 
@@ -27,7 +29,7 @@ class Engine {
       
     }
 
-    private Expr process(String string) {
+    private ArrayList<Expr> process(String string) {
         Expr expr;
         JTextArea jTextArea = this.gui.getOutputArea();
         Context context = this.gui.getContext();
@@ -48,7 +50,10 @@ class Engine {
         }
         
         expr = context.substitute(expr);
-        jTextArea.setText(expr.toStringSubstituteBelow(context2, n, bl));
+        
+        expressions = new ArrayList<Expr>();
+        expressions.add(expr);
+        
         Expr expr3 = expr;
         int n2 = expr.size();
         Expr expr4 = Simplify.simplify(expr);
@@ -56,18 +61,20 @@ class Engine {
         Expr[] arrexpr = new Expr[100];
         int n3 = -1;
         int n4 = 0;
+    
         while (expr4 != expr) {
             expr = expr4;
             if (bl2) {
-                jTextArea.append("\n   = ");
-                jTextArea.append(expr.toString(context2, n, bl));
+                
+                expressions.add(expr);
             }
             int n5 = expr.size();
             ExprWrapper exprWrapper = new ExprWrapper(expr);
             if ( ++n4 > Options.getMaxReductionsOption().getValue() || hashSet.contains(exprWrapper)) {
                 jTextArea.append("\n   = ... ");
                 expr = expr3;
-                jTextArea.append(expr.toString(context2, n, bl));
+                
+                expressions.add(expr);
                 break;
             }
             if (++n3 == arrexpr.length) {
@@ -85,10 +92,15 @@ class Engine {
             expr4 = Simplify.simplify(expr);
         }
         if (!bl2) {
-            jTextArea.append("\n   = ");
-            jTextArea.append(expr.toString(context2, n, bl));
+            expressions.add(expr);
         }
-        return expr;
+        
+        //display list of expressions
+        System.out.println("list of expr:");
+        for(int i = 0; i < expressions.size(); i++){
+            System.out.println(expressions.get(i));
+        }
+        return expressions;
     }
 
   

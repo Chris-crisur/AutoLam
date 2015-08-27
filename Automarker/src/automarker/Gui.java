@@ -157,7 +157,7 @@ package automarker;
 /*     */
 /* 160 */     public void actionPerformed(ActionEvent paramActionEvent) { 
 /* 161 */       String str2 = Gui.this.input.getText();
-/* 162 */       Gui.this.engine.addDefinition(str2);;
+/* 162 */       Gui.this.engine.addDefinition(str2);
 /* 163 */      
 /*     */     }
 /*     */
