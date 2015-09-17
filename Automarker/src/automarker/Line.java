@@ -61,7 +61,11 @@ public class Line {
     public void setMark(double mark) {
         this.mark = mark;
     }
-
+    
+    public void addMark(double mark) {
+        this.mark += mark;
+    }
+    
     @Override
     public String toString() {
         return reduction + " -> " + expression +  "\t[" + reasoning + "] (" + mark + ')';

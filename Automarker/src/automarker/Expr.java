@@ -166,7 +166,15 @@ abstract class Expr {
         }
 
         private String allocate() {
-            for (;;) {
+            String string;
+            while (!(this.last_alloc < 0 || this.ident_names.contains("i" + this.last_alloc))) {
+                --this.last_alloc;
+            }
+            do {
+                ++this.last_alloc;
+            } while (this.ident_names.contains(string = "i" + this.last_alloc));
+            return string;
+            /*for (;;) {
                 this.last_alloc -= 1;
                 if (this.last_alloc >= 0) {
                     if (this.ident_names.contains("i" + this.last_alloc)) {
@@ -179,7 +187,7 @@ abstract class Expr {
                 this.last_alloc += 1;
                 str = "i" + this.last_alloc;
             } while (this.ident_names.contains(str));
-            return str;
+            return str;*/
         }
 
         private char getLeftParen() {

@@ -88,10 +88,14 @@ public class Solution {
     public void setDateSubmitted(String dateSubmitted) {
         this.dateSubmitted = dateSubmitted;
     }
-
-    public void setMark(){
+    
+    public void setMark(int markPen){
         for (Line line : lines) {
             mark+=line.getMark();
+        }
+        mark = mark;
+        if(mark>question.getMaxMark()/markPen){
+            mark = question.getMaxMark()/markPen;
         }
     }
 

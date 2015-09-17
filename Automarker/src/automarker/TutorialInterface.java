@@ -206,7 +206,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
                 }else if(firstChar=='>'){
                     start = line.substring(1);
                 }else{
-                    quest+=" " + line;
+                    quest+="\n" + line;
                 }
             }
             reader.close();
@@ -359,7 +359,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         public LinePanel(){
             super(new BorderLayout());
             reductionBox = new JComboBox();
-            reductionBox.setModel(new DefaultComboBoxModel(new String[] { "α", "β", "η", "→" }));
+            reductionBox.setModel(new DefaultComboBoxModel(new String[] {"β", "α", "η", "→" }));
             expressionField = new JTextField(50);
             expressionField.addActionListener(new MyInputListener());
             reasonField = new JTextField(30);
@@ -442,12 +442,6 @@ public class TutorialInterface extends JFrame implements ActionListener{
             add(startField);
             add(addLine);
             add(lineP);
-            add(new LinePanel());
-            add(new LinePanel());
-            add(new LinePanel());
-            add(new LinePanel());
-            add(new LinePanel());
-            add(new LinePanel());
             
             addLine.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {

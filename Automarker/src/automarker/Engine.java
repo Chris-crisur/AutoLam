@@ -46,12 +46,12 @@ class Engine {
             //jTextArea.setText(var9_9.getMessage());
             return null;
         }
-
+        
         expr = context.substitute(expr);
-
+        
         expressions = new ArrayList<Expr>();
         expressions.add(expr);
-
+           
         Expr expr3 = expr;
         int n2 = expr.size();
         Expr expr4 = Simplify.simplify(expr);
@@ -71,7 +71,6 @@ class Engine {
             if (++n4 > Options.getMaxReductionsOption().getValue() || hashSet.contains(exprWrapper)) {
                 //jTextArea.append("\n   = ... ");
                 expr = expr3;
-
                 expressions.add(expr);
                 break;
             }
