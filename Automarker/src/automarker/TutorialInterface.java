@@ -299,7 +299,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
                     }
                 }
             }else{
-                boolean result = loadQuestions("questions.txt");
+                boolean result = loadQuestions("questionsTutorial.txt");
                     if(result){
                         mainPanel.remove(upload);   //next replaces upload button
                         mainPanel.add(next,BorderLayout.EAST);

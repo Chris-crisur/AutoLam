@@ -5,7 +5,7 @@ import javax.swing.JMenu;
 class Options
 {  
 	//default values
-	private static Option[] options = { new IntOption("Maximum Reductions", "max_reductions", 100, new int[] { 25, 50, 100, 200, 300, 400, 500, 1000 }), new EvaluationOrderOption(1), new BooleanOption("Enable Eta Reductions", "eta_reductions", true), new BooleanOption("Use Applied Calculus", "use_applied", true), new IntOption("Maximum Length", "max_length", 300, new int[] { 100, 300, 1000, Integer.MAX_VALUE }), new BooleanOption("Show Intermediate Steps", "show_intermediate", true), new BooleanOption("Substitute Symbols", "substitute_symbols", true), new BooleanOption("Vary Parentheses", "vary_parentheses", false), new PrintLambdaOption(true), new FontSizeOption(12), new BooleanOption("Show Browser", "show_browser", true) };
+	private static Option[] options = { new IntOption("Maximum Reductions", "max_reductions", 100, new int[] { 25, 50, 100, 200, 300, 400, 500, 1000 }), new EvaluationOrderOption(2), new BooleanOption("Enable Eta Reductions", "eta_reductions", true), new BooleanOption("Use Applied Calculus", "use_applied", true), new IntOption("Maximum Length", "max_length", 300, new int[] { 100, 300, 1000, Integer.MAX_VALUE }), new BooleanOption("Show Intermediate Steps", "show_intermediate", true), new BooleanOption("Substitute Symbols", "substitute_symbols", true), new BooleanOption("Vary Parentheses", "vary_parentheses", false), new PrintLambdaOption(true), new FontSizeOption(12), new BooleanOption("Show Browser", "show_browser", true) };
 static abstract interface Listener
 {
   public abstract void valueChanged(Options.Option paramOption);
@@ -353,9 +353,12 @@ static void printOptions()
 static JMenu getMenu()
 {
    JMenu localJMenu1 = new JMenu("Options");
-   JMenu localJMenu2 = new JMenu("Engine");localJMenu1.add(localJMenu2);
-   JMenu localJMenu3 = new JMenu("Printing");localJMenu1.add(localJMenu3);
-   JMenu localJMenu4 = new JMenu("Interface");localJMenu1.add(localJMenu4);
+   JMenu localJMenu2 = new JMenu("Engine");
+   localJMenu1.add(localJMenu2);
+   JMenu localJMenu3 = new JMenu("Printing");
+   localJMenu1.add(localJMenu3);
+   JMenu localJMenu4 = new JMenu("Interface");
+   localJMenu1.add(localJMenu4);
   
    localJMenu2.add(getMaxReductionsOption().createMenuItem());
    localJMenu2.add(getEvaluationOrderOption().createMenuItem());
