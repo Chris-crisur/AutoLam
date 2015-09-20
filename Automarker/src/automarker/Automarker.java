@@ -30,7 +30,7 @@ public class Automarker {
     Automarker(){
         //TODO: sign in
         //loadFiles();
-        solutions = TestCases.loadTest("conversion");
+        solutions = TestCases.loadTest("all");
         
         markSolutions();
         
@@ -528,6 +528,7 @@ public class Automarker {
                         break;
                     case '>':
                     case '→':
+                    case '=':
                         Debug("CONVERSION");
                         Debug("prevReducedExpr: " + prevReducedExpr);
                         Debug("currReducedExpr: " + currReducedExpr);
@@ -544,7 +545,11 @@ public class Automarker {
                         //user may have changed brackets, as long as still same expression, fine
                         else if(prevReducedExpr.toString().equals(currReducedExpr.toString()) ){ 
                             markAwarded=true;
-                            Debug("no mark penalty");
+                            if(curr.getReduction()=='='){
+                                curr.setMark(1);
+                            }else{
+                                Debug("no mark penalty");
+                            }
                         }
                         else{
                             markAwarded = true;
@@ -588,6 +593,7 @@ public class Automarker {
                         case 'α':
                         case '>':
                         case '→':
+                        case '=':
                             if(curr.getReduction()=='a'||curr.getReduction()=='α')
                                 Debug("ALPHA");
                             else
@@ -608,50 +614,14 @@ public class Automarker {
                                     targets[i] = alphaChanges[i].substring(splitIndex+1);
                                 }
                             }
-                            
                             //the calculator automatically alpha-converts
                             //but separate expressions may have the same iX value
                             //changing these to a unique number helps with application
                             //of reasoning marking
                             int countUniqueAlphas = countAlpha(prevStr);
                             
-                            /*String [] checkMultiI;
-                            StringBuilder prevStrBuilder = new StringBuilder();
-                            for(int i=0;i<countUniqueAlphas;i++){
-                                checkMultiI = prevStr.split("\\\\i"+i);
-                                for(int j=1;j<checkMultiI.length;j++){
-                                    checkMultiI[j] = "\\i"+i+checkMultiI[j];
-                                }
-                                
-                                //if there are multiple expressions alpha converted with same iX
-                                //there will be 3 Strings or more
-                                Debug("i"+i+" checkMultiI.length: " + checkMultiI.length);
-                                if(checkMultiI.length>2){
-                                    //multiple \iX's
-                                    for(int j=2;j<checkMultiI.length;j++){
-                                        countUniqueAlphas+=1;
-                                        checkMultiI[j] = checkMultiI[j].replace("i"+i,"i"+countUniqueAlphas);
-                                    }
-                                }
-                                prevStrBuilder = new StringBuilder();
-                                //once duplicat/ambiguous iX's have been correctd, remake prevStr
-                                for(String cMI:checkMultiI){
-                                    prevStrBuilder.append(cMI); 
-                                }
-                                prevStr = prevStrBuilder.toString();
-                            }
-                            */
-                            //all iX's should now be unique
-                            //Debug("prevStr after checkMultiI: " + prevStr);
-                            //Debug("target: " + target);
-                            
-                            //String currStrReplace = currStr;
-                            
-                            
-                            //map iX to target
-                            Map<String,String> iToTarget = new HashMap<>();
                             String compareStr = currStr;
-                            boolean foundRelation = false;
+                            
                             Debug("countUniqueAlphas+1: " + (countUniqueAlphas+1) + " targets.length: " + targets.length);
                             Debug("currStr: " + currStr);
                             
@@ -700,7 +670,10 @@ public class Automarker {
                                     Debug("replacementCorrect: " + replacementCorrect[i]);
                                     Debug("award half mark for reasoning (correctly replaced)");
                                     if(curr.getReduction()=='>'||curr.getReduction()=='→'){
-                                        Debug("CONVERSION corret");//no marks for conversion
+                                        Debug("CONVERSION correct");//no marks for conversion
+                                    }else if(curr.getReduction()=='='){
+                                        curr.addMark(0.5);
+                                        Debug("EQUALS correct");
                                     }else
                                         curr.addMark(0.5);
                                 }
@@ -721,8 +694,12 @@ public class Automarker {
                                 Debug("award half mark(s) for reasoning (compareStr.equals(prevStr)): ");
                                 Debug("alphaChanges.length/2: " + alphaChanges.length/2.0);
                                 if(curr.getReduction()=='>'||curr.getReduction()=='→'){
-                                    Debug("CONVERSION corret");//no marks for conversion
-                                }else
+                                    Debug("CONVERSION correct");//no marks for conversion
+                                }else if(curr.getReduction()=='='){
+                                    curr.addMark(alphaChanges.length/2.0);
+                                    Debug("EQUALS correct");
+                                }
+                                else
                                     curr.addMark(alphaChanges.length/2.0);
                                 
                                 /*for (int i=0;i<alphaChanges.length;i++){
@@ -734,126 +711,26 @@ public class Automarker {
                                     if(compareStr.equals(currStr)){
                                         Debug("CONVERSION correct");//no marks for conversion
                                     }
-                            }else{
-                                /*for (int i=0;i<alphaChanges.length;i++){
-                                    compareStr = compareStr.replace(targets[i],replacements[i]);
-                                }
-                                try {
-                                    compareStr = Parser.parse(compareStr).toString();
-                                } catch (Parser.ParseException pe) {
-                                    System.out.println(pe.getMessage());
-                                }
-                                Debug("compareStr (2nd try): " + compareStr);
-                                if(compareStr.equals(prevStr)){
-                                    Debug("compareStr.equals(prevStr)");
-                                    Debug("award mark for reasoning: ");
-                                    Debug("alphaChanges.length/2: " + alphaChanges.length/2.0);
-                                    curr.addMark(alphaChanges.length/2.0);
-                                }
-                                */
                             }
                             
-                                /*
-                                foundRelation = false;
-                                for(int j=0;j<targets.length;j++){
-                                    //check if target replaced by iX is same as before after parsing 
-                                    //parsing auto alpha converts where necessary
-                                    
-                                    compareStr = prevStr.replace("i"+i,targets[j]);
-                                    Debug("compareStr before parse: " + compareStr);
-                                    try {
-                                        compareStr = Parser.parse(compareStr).toString();
-                                    } catch (Parser.ParseException pe) {
-                                        System.out.println(pe.getMessage());
-                                    }
-                                    Debug("compareStr: " + compareStr);
-                                    if(compareStr.equals(prevStr)){
-                                        Debug("compareStr.equals(prevStr) i" + i + "\t" + targets[j]);
-                                        
-                                        iToTarget.put(targets[j], "i"+i);
-                                        foundRelation = true;
-                                        //break;
-                                    }
-                                }
-                                */
-                            
-                            
-                            //could replace all iX's with targets in diff combinations to determine correctness
-                            /*
-                            for(int i=0;i<alphaChanges.length;i++){
-                                
-                                target = iToTarget.get(targets[i]); //get iX which corresponds to target (as determined above)
-                                replacement = replacements[i];
-
-
-                                Debug("target: " + target);
-                                Debug("replacement: " + replacement);
-
-                                int countTargetBefore = 0;
-                                int countTargetAfter = 0;
-                                int countReplacementBefore = 0;
-                                int countReplacementAfter = 0;
-                                int targetIndex = 0;
-                                int indexReplace = 0;
-
-                                while(targetIndex>-1&&indexReplace>-1){
-                                    targetIndex = prevStr.indexOf(target,targetIndex);
-                                    if(targetIndex>-1)
-                                        countTargetBefore += 1;
-                                    indexReplace = prevStr.indexOf(replacement,indexReplace);
-                                    if(indexReplace>-1)
-                                        countReplacementBefore += 1;
-                                }
-
-                                targetIndex = 0;
-                                indexReplace = 0;
-                                while(targetIndex>-1&&indexReplace>-1){
-                                    targetIndex = currStr.indexOf(target,targetIndex);
-                                    if(targetIndex>-1)
-                                        countTargetAfter += 1;
-                                    indexReplace = currStr.indexOf(replacement,indexReplace);
-                                    if(indexReplace>-1)
-                                        countReplacementAfter += 1;
-                                }
-                                Debug("countTargetBefore: " + countTargetBefore);
-                                Debug("countTargetAfter: " + countTargetAfter);
-                                Debug("countReplacementBefore: " + countReplacementBefore);
-                                Debug("countReplacementAfter: " + countReplacementAfter);
-
-                                if((countTargetBefore-countTargetAfter)==(countReplacementAfter-countReplacementBefore)){
-                                    Debug("award mark for reasoning");
+                            if(curr.getMark()==1&&curr.getReduction()=='='){
+                                //mark not awarded for reasoning, but still correct line, have an extra check just for '=' (arithmatic)
+                                int tarInd = prevStr.indexOf(target);
+                                compareStr = prevStr.substring(0,tarInd) + replacement + prevStr.substring(tarInd+target.length());
+                                Debug("last chance for compareStr: " + compareStr);
+                                if(compareStr.equals(currStr)){
                                     curr.addMark(1);
+                                    Debug("EQUALS correct");
                                 }
                             }
-                            */
-                           /* int replacementOffset = 0;
-                            boolean goodLine = true;
-                            for (int i=0;i<prevStr.length();i++){
-                                if(prevStr.charAt(i)!=currStr.charAt(i)){
-                                    Debug(prevStr.substring(i+replacementOffset,i+replacementOffset+target.length()) + " vs " + target);
-                                    if(prevStr.substring(i,i+target.length()).equals(target)){
-                                        Debug(currStr.substring(i,i+replacement.length()) + " vs " + replacement);
-                                        if(currStr.substring(i+replacementOffset,i+replacementOffset+replacement.length()).equals(replacement)){
-                                            replacementOffset+= replacement.length()-target.length();
-                                        }else{
-                                            goodLine = false;
-                                            break;
-                                        }
-                                    }else{
-                                        goodLine = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            Debug("goodLine: " + goodLine);
-                            */
+                            
                             break;
                         case 'b':
                         case 'B':
                         case 'β':
                             Debug("BETA");
                             if(replacement.contains("\\")||replacement.contains("λ")){
-                                if(replacement.charAt(0)!='('){
+                                if(replacement.charAt(0)!='('||replacement.charAt(replacement.length()-1)!=')'){
                                     Debug("lambda expression, but not with parentheses");
                                     replacement = "(" + replacement + ")";//add brackets
                                     //break;
@@ -881,9 +758,10 @@ public class Automarker {
                             prevStr = tempPrevStr;
                             int initialIndex = indexTarget;
                             Debug("indexTarget: " + indexTarget);
-                            if(indexTarget>0){
+                            char cP = '?';
+                            if(indexTarget>=0){
                                 int p=indexTarget;
-                                char cP = prevStr.charAt(p-1);
+                                cP = prevStr.charAt(p-1);
                                 if(cP=='('){
                                     newStr = prevStr.substring(0,indexTarget-1);
                                 }else{
@@ -891,9 +769,15 @@ public class Automarker {
                                 }
                                 p=p+target.length()+2; //move to past '.' of lambda expression
                                 Debug("newStr from prevStr: " + newStr);
+                                Debug("p: " + p + " prevStr.length(): " + prevStr.length());
                                 while(pNum>0){
                                     cP = prevStr.charAt(p);
-                                    if(cP == '('){
+                                    //Debug("cP: "+cP);
+                                    if(prevStr.length()>=p+target.length()&&prevStr.substring(p,p+target.length()).equals(target)){
+                                        newStr=newStr+replacement;    
+                                    }else if(newStr.equals(currStr)){
+                                        break;
+                                    }else if(cP == '('){
                                         pNum+=1;
                                         newStr=newStr+cP;
                                     }else if(cP == ')'){
@@ -901,18 +785,27 @@ public class Automarker {
                                         if(pNum<1)
                                             break;
                                         newStr=newStr+cP;
-                                    }else if(prevStr.substring(p,p+target.length()).equals(target)){
-                                        newStr=newStr+replacement;    
-                                    }
-                                    else{
+                                    }else{
                                         newStr=newStr+cP;
                                     }
                                     p+=1;
+                             //       Debug(newStr);
                                 }
                                 Debug("newStr: " + newStr);
                                 
                                 if(currStr.charAt(0)=='(')
                                     newStr = "(" + newStr + ")";//add parentheses for separation and maintenance of logic
+                                
+                                //based on number of parenthese, may need to include more at end of newStr before adding remaining
+                                int cntP = 0;
+                                for(int i=0;i<newStr.length();i++){
+                                    if(newStr.charAt(i)=='(')
+                                        cntP+=1;
+                                    else if(newStr.charAt(i)==')')
+                                        cntP-=1;
+                                }
+                                for(int i=1;i<cntP;i++)
+                                    newStr= newStr+")";
                                 
                                 Debug(prevStr.length() + " >? " + (p+3+replacement.length()));
                                 if(prevStr.length()>(p+3+replacement.length())){
@@ -928,7 +821,8 @@ public class Automarker {
                                 } catch (Parser.ParseException pe) {
                                     Debug("ParseException: " + pe.getMessage());
                                     if(pe.getMessage().equals("Right parenthesis missing")){
-                                        newStr = newStr.substring(0,initialIndex-1) + newStr.substring(initialIndex);
+                                        newStr = newStr+")";
+                                        //newStr = newStr.substring(0,initialIndex-1) + newStr.substring(initialIndex);
                                         Debug("newStr: " + newStr);
                                         initialIndex-=1;//for further right parenthesis missing errors
                                     }else if(newStr.charAt(newStr.length()-1)==')'){

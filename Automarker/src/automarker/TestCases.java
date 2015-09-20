@@ -165,6 +165,22 @@ class TestCases {
                 solutionList.add(conversionTestOne());
                 if(!index.equals("all")&&!index.equals("conversion"))
                     break;
+            case "tutorial":
+                if(index.equals("conversion")){
+                    break;
+                }
+            case "t1":
+                solutionList.add(conversionTestOne());
+                if(!index.equals("all")&&!index.equals("tutorial"))
+                    break;
+            case "t2":
+                solutionList.add(tutorialTestTwo());
+                if(!index.equals("all")&&!index.equals("tutorial"))
+                    break;
+            case "t3":
+                solutionList.add(tutorialTestThree());
+                if(!index.equals("all")&&!index.equals("tutorial"))
+                    break;
             /*case "c2":
                 solutionList.add(conversionTestTwo());
                 if(!index.equals("all")&&!index.equals("conversion"))
@@ -876,31 +892,41 @@ class TestCases {
         return new Solution(new Question(descrip,22,require,start),lineArr.toArray(new Line[1]));
     }
     
-    private static Solution conversionTestTwo(){
-        /*  */
-        String descrip = "C1:22";
-        String require = "Applicative";
-        String start = "(k f x) (k t y z)";
+    private static Solution tutorialTestTwo(){
+        /*  modified to include an extra '*' */
+        String descrip = "T1:18";
+        String require = "Normal";
+        String start = "(λx.(* (* x x) x)) ((λy.(+ y 1)) 2)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(k f x) j",'>',"j/(k t y z)"));
-        lineArr.add(new Line("(λx.λy.λz.x y z) f x j",'>',"(λx.λy.λz.x y z)/k"));
-        lineArr.add(new Line("(λy.λz.f y z) x j",'b',"f/x"));
-        lineArr.add(new Line("(λz.f x z) j",'b',"x/y"));
-        lineArr.add(new Line("f x j",'b',"j/z"));
-        lineArr.add(new Line("(λx.λy.y) x j",'>',"(λx.λy.y)/f"));
-        lineArr.add(new Line("(λy.y) j",'b',"x/x"));
-        lineArr.add(new Line("j",'b',"j/y"));
-        lineArr.add(new Line("(λx.λy.λz.x y z) t y z ",'>',"(λx.λy.λz.x y z) t y z/j"));
-        lineArr.add(new Line("(λy.λz.t y z) y z",'b',"t/x"));
-        lineArr.add(new Line("(λz.t y z) z",'b',"y/y"));
-        lineArr.add(new Line("t y z",'b',"z/z"));
-        lineArr.add(new Line("(λx.λy.x) y z",'>',"(λx.λy.x)/t"));
-        lineArr.add(new Line("(λx.λa.x) y z",'a',"a/y"));
-        lineArr.add(new Line("(λa.y) z ",'b',"y/x"));
-        lineArr.add(new Line("y ",'b',"z/a"));
+        lineArr.add(new Line("* (* ((λy.+ y 1) 2) ((λy.+ y 1) 2)) ((λy.+ y 1) 2)",'b',"(λy.+ y 1) 2/x"));
+        //lineArr.add(new Line("* (* ((λy.+ y 1) 2) ((λy.+ y 1) 2)) ((λy.+ y 1) 2)",'b',"((λy.+ y 1) 2)/x"));
+        lineArr.add(new Line("* (* (+ 2 1) ((λy.+ y 1) 2)) ((λy.+ y 1) 2)",'b',"2/y"));
+        lineArr.add(new Line("* (* 3 ((λy.+ y 1) 2)) ((λy.+ y 1) 2)",'=',"3/(+ 2 1)"));
+        lineArr.add(new Line("* (* 3 (+ 2 1)) ((λy.+ y 1) 2)",'b',"2/y"));
+        lineArr.add(new Line("* (* 3 3) ((λy.+ y 1) 2)",'=',"3/(+ 2 1)"));
+        lineArr.add(new Line("* 9 ((λy.+ y 1) 2)",'=',"9/(* 3 3)"));
+        lineArr.add(new Line("* 9 (+ 2 1)",'b',"2/y"));
+        lineArr.add(new Line("* 9 3",'=',"3/(+ 2 1)"));
+        lineArr.add(new Line("27",'=',"27/(* 9 3)"));
         
-        return new Solution(new Question(descrip,22,require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,18,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    private static Solution tutorialTestThree(){
+        /*  modified to include an extra '*' */
+        String descrip = "T2:10";
+        String require = "Applicative";
+        String start = "(λx.(* (* x x) x)) ((λy.(+ y 1)) 2)";
+        List<Line> lineArr = new ArrayList<>();
+        
+                lineArr.add(new Line("(λx.* (* x x) x) (+ 2 1)",'b',"2/y"));
+        lineArr.add(new Line("(λx.* (* x x) x) 3",'=',"3/(+ 2 1)"));
+        lineArr.add(new Line("* (* 3 3) 3",'b',"3/x"));
+        lineArr.add(new Line("* 9 3",'=',"9/(* 3 3)"));
+        lineArr.add(new Line("27",'=',"27/(* 9 3)"));
+        
+        return new Solution(new Question(descrip,10,require,start),lineArr.toArray(new Line[1]));
     }
     
 }
