@@ -102,13 +102,27 @@ A:
 S7
 Dnull
 Q7
-#SP7:3
+#SP7:2
 Right answer for (λx.x x)(λx.x x)
 at least 1 beta reduction attempted
-<3
+<2
 !
 >(λx.x x)(λx.x x)
 A:
+β -> (λx.x x)(λx.x x)	[(λx.x x)/x]
+→ -> divergent
+
+S72
+Dnull
+Q7
+#SP7-2:2
+Right answer for (λx.x x)(λx.x x)
+at least 1 beta reduction attempted
+<2
+!
+>(λx.x x)(λx.x x)
+A:
+β -> (λx.x x)(λx.x x)	[(λx.x x)/x]
 β -> (λx.x x)(λx.x x)	[(λx.x x)/x]
 → -> divergent
 

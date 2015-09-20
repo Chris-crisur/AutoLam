@@ -11,11 +11,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Chris
+ * 
+ * parameterise ambiguity
+ * 
  */
 public class Automarker {
     private boolean debug = true;
@@ -24,8 +29,8 @@ public class Automarker {
     
     Automarker(){
         //TODO: sign in
-        loadFiles();
-        //solutions = TestCases.loadTest("all");
+        //loadFiles();
+        solutions = TestCases.loadTest("conversion");
         
         markSolutions();
         
@@ -146,11 +151,19 @@ public class Automarker {
         Stream stream = new Stream();
         
         Options.getEtaReductionsOption().setValue(false);
-        Options.getEvaluationOrderOption().setValue(3); //default evaluation is normal (without thunks)
+        Options.getEvaluationOrderOption().setValue(2); //default evaluation is normal (without thunks)
         
         for (Solution sol: solutions){
             String qStart = sol.getQuestion().getStart();
             String qStartChanged = qStart;      //used for alpha conversion changes
+            String require = sol.getQuestion().getRequirements();
+            if(require.equalsIgnoreCase("Applicative")){
+                Options.getEvaluationOrderOption().setValue(0); //set evaulation to applicative
+                Debug("Applicative");
+            }else{
+                Options.getEvaluationOrderOption().setValue(2); //back to default normal (without thunks)
+                Debug("Normal");
+            }
             Line [] lines = sol.getLines();
             try {
                  Expr expr = Parser.parse(qStart);
@@ -204,13 +217,27 @@ public class Automarker {
                 markAwarded=false;
                 Debug("\nLINE: " + curr);
                   
-                if(currResult.size()==1){
-                    //done
-                    break;
+                if(currResult.size()==1 && !(curr.getReduction()=='>'||curr.getReduction()=='→')){
+                    //check if really last by enabling eta
+                    Debug("size == 1: " + currResult);
+                    Options.getEtaReductionsOption().setValue(true);
+                    Debug(Options.getEtaReductionsOption().getValue());
+
+                    currResult = stream.runExpr(prev.getExpression()); 
+                    Options.getEtaReductionsOption().setValue(false);
+                    Debug("currResult: " + currResult);
+                    //if really done, break
+                    if(currResult.size()==1){
+                        break;
+                    }
                 }
                 
                 prevAlphaExpr = currAlphaExpr;    //should be used to keep track of alpha reductions
-                prevReducedExpr = currResult.get(1);    //first line of reduction
+                if(currResult.size()>1){
+                    prevReducedExpr = currResult.get(1);    //first line of reduction
+                }else if(prevReducedExpr == null){
+                    prevReducedExpr = currResult.get(0);
+                }
                 prevLastExpr = currLastExpr;
                 
                 Debug("prev.getExpression: " + prev.getExpression());
@@ -278,7 +305,10 @@ public class Automarker {
                                         Debug("numIs: " + numIs);
                                         Debug("charAt(" + (i-numIs) + ")");
                                         if(c != c2){                                                        //if character changed, good!
+                                            numIsTrack = countI(prevAlphaStr.substring(0,i-numIs)) - countI(trackAlphaChange.substring(0,i-numIs));
+                                            Debug("numIsTrack: " + numIsTrack);
                                             trackAlphaChange = trackAlphaChange.substring(0,i-numIsTrack) + c2 + trackAlphaChange.substring(i-numIsTrack+2);
+                                            Debug("prevAlphaStr: " + prevAlphaStr);
                                             Debug("trackAlphaChange: " + trackAlphaChange);
                                             if(c2 != prev.getExpression().charAt(i-iOffset)){               //check lambda bound symbol changed                                                
                                                 int boundVarI = prevAlphaStr.indexOf("i"+alphaNum,i+1);     //find corresponding bound var
@@ -308,8 +338,13 @@ public class Automarker {
                                                         if(c3==c2){                                             //bound var also changed
                                                             Debug("bound var changed");
                                                             bound = true;
-                                                            numIsTrack = countI(prevAlphaStr.substring(0,boundVarI-numIs)) - countI(trackAlphaChange.substring(0,boundVarI-numIs));;
+                                                            numIsTrack = countI(prevAlphaStr.substring(0,boundVarI)) - countI(trackAlphaChange.substring(0,boundVarI-numIs));
+                                                            Debug(prevAlphaStr.substring(0,boundVarI));
+                                                            Debug(trackAlphaChange.substring(0,boundVarI-numIs));
+                                                            Debug(countI(prevAlphaStr.substring(0,boundVarI-numIs)) + " - " +  countI(trackAlphaChange.substring(0,boundVarI-numIs)));
                                                             Debug("numIsTrack: " + numIsTrack);
+                                                            Debug("prevAlphaStr: " + prevAlphaStr);
+                                                            Debug(trackAlphaChange.substring(0,boundVarI-numIsTrack) + "\t[" + c2 + "]\t"+trackAlphaChange.substring(boundVarI-numIsTrack+2));
                                                             trackAlphaChange = trackAlphaChange.substring(0,boundVarI-numIsTrack) + c2 + trackAlphaChange.substring(boundVarI-numIsTrack+2);
                                                             Debug("trackAlphaChange: " + trackAlphaChange);
                                                         }else{
@@ -384,6 +419,9 @@ public class Automarker {
                                 Debug("award mark");
                                 curr.addMark(1);
                                 markAwarded=true;
+                            }else if(numAlphasCurrResult==numAlphasPrevResult){
+                                Debug("mark not awarded, but not penalised");
+                                markAwarded=true;
                             }
                             
                         }
@@ -442,6 +480,27 @@ public class Automarker {
                                
                             }
                         }
+                        
+                        if(!markAwarded && require.equals("")){
+                            //try applicative (default normal)
+                            Debug("mark not awarded, require empty");
+                            Options.getEvaluationOrderOption().setValue(0);
+                            currResult = stream.runExpr(curr.getExpression());  //get new reductions based on current line
+                            Debug("currResult: " + currResult);
+                            try {
+                                currReducedExpr = Parser.parse(curr.getExpression());
+                            } catch (Parser.ParseException pe) {
+                                System.out.println(pe.getMessage());
+                                break;
+                                //jTextArea.setText(pe.getMessage());
+                            }
+                            prevReducedExpr = currResult.get(0);
+                            currLastExpr = currResult.get(currResult.size()-1);
+                            markAwarded = doBetaReduction(prevLastExpr, currLastExpr, prevReducedExpr, currReducedExpr, curr);
+                            Options.getEvaluationOrderOption().setValue(2);
+                        }
+                        
+                        
                         break;    
                     case 'n':
                     case 'η':
@@ -463,28 +522,458 @@ public class Automarker {
 
                         markAwarded = doBetaReduction(prevLastExpr, currLastExpr, prevReducedExpr, currReducedExpr, curr);
 
+                        if(currResult.size()>2)
+                            currResult.set(1,currResult.get(2)); //move an element up to compensate for the prev expression used to recalculate currResult
                         
                         break;
                     case '>':
                     case '→':
                         Debug("CONVERSION");
+                        Debug("prevReducedExpr: " + prevReducedExpr);
+                        Debug("currReducedExpr: " + currReducedExpr);
+                        if(curr.getExpression().equalsIgnoreCase("divergent")){
+                            String lastOriginal = originalResult.get(originalResult.size()-1).toString();
+                            String secondLastOriginal = originalResult.get(originalResult.size()-2).toString();
+                            if(lastOriginal.equals(secondLastOriginal)){
+                                Debug("award mark");
+                                curr.setMark(1);
+                                markAwarded=true;
+                            }
+                        }
+                        //could be changed so that penalties only occur for beta reductions
+                        //user may have changed brackets, as long as still same expression, fine
+                        else if(prevReducedExpr.toString().equals(currReducedExpr.toString()) ){ 
+                            markAwarded=true;
+                            Debug("no mark penalty");
+                        }
+                        else{
+                            markAwarded = true;
+                        }
                         
                         break;
                     default:
                         break;
                 }
                 
-                if(!markAwarded){
+                /*** reasoning **/
+                Debug("-------REASONING-------");
+                //check change of symbols correct
+                String reasoning = curr.getReasoning();
+                int splitIndex = reasoning.indexOf("/");
+                if(splitIndex<0){
+                    System.out.println("no split in reasoning");
+                    if(curr.getReduction()=='n'||curr.getReduction()=='η'){
+                        Debug("award mark for reasoning");
+                        curr.addMark(1);
+                    }
+                }else{
+                    String replacement = reasoning.substring(0,splitIndex);
+                    String target = reasoning.substring(splitIndex+1);
+                    String prevStr = "";//prev.getExpression();
+                    try {
+                        prevStr = Parser.parse(prev.getExpression()).toString();
+                    } catch (Parser.ParseException pe) {
+                        System.out.println(pe.getMessage());
+                        break;
+                        //jTextArea.setText(pe.getMessage());
+                    }
+                    String currStr = currReducedExpr.toString();
+                    Debug("prevStr: " + prevStr);
+                    Debug("currStr: " + currStr);
+                    String newStr = "";
+                    Debug("target: " + target);
+                    Debug("replacement: " + replacement);
+                    switch(curr.getReduction()){
+                        case 'a':
+                        case 'α':
+                        case '>':
+                        case '→':
+                            if(curr.getReduction()=='a'||curr.getReduction()=='α')
+                                Debug("ALPHA");
+                            else
+                                Debug("CONVERSION");
+                            Debug("prevStr: " + prevStr);
+                            //there can be multiple alpha conversions done in a step, separated by a comma (',')
+                            //alpha conversions are described similarly to beta reductions: 
+                            //g/h means g replaces h, where h is a lambda expression
+                            String [] alphaChanges = reasoning.split(",");
+                            String [] targets = new String[alphaChanges.length];
+                            String [] replacements = new String[alphaChanges.length];
+                            for(int i=0;i<alphaChanges.length;i++){
+                                splitIndex = alphaChanges[i].indexOf("/");
+                                if(splitIndex<0){
+                                    System.out.println("no split in reasoning");
+                                }else{
+                                    replacements[i] = alphaChanges[i].substring(0,splitIndex);
+                                    targets[i] = alphaChanges[i].substring(splitIndex+1);
+                                }
+                            }
+                            
+                            //the calculator automatically alpha-converts
+                            //but separate expressions may have the same iX value
+                            //changing these to a unique number helps with application
+                            //of reasoning marking
+                            int countUniqueAlphas = countAlpha(prevStr);
+                            
+                            /*String [] checkMultiI;
+                            StringBuilder prevStrBuilder = new StringBuilder();
+                            for(int i=0;i<countUniqueAlphas;i++){
+                                checkMultiI = prevStr.split("\\\\i"+i);
+                                for(int j=1;j<checkMultiI.length;j++){
+                                    checkMultiI[j] = "\\i"+i+checkMultiI[j];
+                                }
+                                
+                                //if there are multiple expressions alpha converted with same iX
+                                //there will be 3 Strings or more
+                                Debug("i"+i+" checkMultiI.length: " + checkMultiI.length);
+                                if(checkMultiI.length>2){
+                                    //multiple \iX's
+                                    for(int j=2;j<checkMultiI.length;j++){
+                                        countUniqueAlphas+=1;
+                                        checkMultiI[j] = checkMultiI[j].replace("i"+i,"i"+countUniqueAlphas);
+                                    }
+                                }
+                                prevStrBuilder = new StringBuilder();
+                                //once duplicat/ambiguous iX's have been correctd, remake prevStr
+                                for(String cMI:checkMultiI){
+                                    prevStrBuilder.append(cMI); 
+                                }
+                                prevStr = prevStrBuilder.toString();
+                            }
+                            */
+                            //all iX's should now be unique
+                            //Debug("prevStr after checkMultiI: " + prevStr);
+                            //Debug("target: " + target);
+                            
+                            //String currStrReplace = currStr;
+                            
+                            
+                            //map iX to target
+                            Map<String,String> iToTarget = new HashMap<>();
+                            String compareStr = currStr;
+                            boolean foundRelation = false;
+                            Debug("countUniqueAlphas+1: " + (countUniqueAlphas+1) + " targets.length: " + targets.length);
+                            Debug("currStr: " + currStr);
+                            
+                            for(int i=0;i<alphaChanges.length;i++){
+                                //for each unique iX
+                                compareStr = compareStr.replace(replacements[i],targets[i]);
+                                Debug("replacements[i]: " + replacements[i] + " targets[i]: " + targets[i]);
+                                
+                            }
+                            
+                            //count # in prev.getExpression and compareStr
+                            int countTargetBefore = 0;
+                            int countTargetAfter = 0;
+                            int targetIndex = 0;
+                            boolean [] replacementCorrect = new boolean[alphaChanges.length];
+                            String prevExprStr = prev.getExpression();
+                            
+                            Debug("prevExprStr: " + prevExprStr);
+                            Debug("compareStr: " + compareStr);
+                            for(int i=0;i<alphaChanges.length;i++){
+                                countTargetBefore = 0;
+                                countTargetAfter = 0;
+                                targetIndex = 0;
+                                Debug("targets[i]: " + targets[i]);
+                                
+                                while(targetIndex>-1){
+                                    targetIndex = prevExprStr.indexOf(targets[i],targetIndex+1);
+                                    if(targetIndex>-1)
+                                        countTargetBefore += 1;
+                                    else
+                                        break;
+                                }
+                                targetIndex = 0;
+                                
+                                while(targetIndex>-1){
+                                    targetIndex = compareStr.indexOf(targets[i],targetIndex+1);
+                                    if(targetIndex>-1)
+                                        countTargetAfter += 1;
+                                    else
+                                        break;
+                                }
+                                Debug("countTargetBefore: " + countTargetBefore);
+                                Debug("countTargetAfter: " + countTargetAfter);
+                                if(countTargetBefore==countTargetAfter){
+                                    replacementCorrect[i] = true;
+                                    Debug("replacementCorrect: " + replacementCorrect[i]);
+                                    Debug("award half mark for reasoning (correctly replaced)");
+                                    if(curr.getReduction()=='>'||curr.getReduction()=='→'){
+                                        Debug("CONVERSION corret");//no marks for conversion
+                                    }else
+                                        curr.addMark(0.5);
+                                }
+                            }
+                            
+                            Debug("compareStr before parse: " + compareStr);
+                            try {
+                                compareStr = Parser.parse(compareStr).toString();
+                            } catch (Parser.ParseException pe) {
+                                System.out.println(pe.getMessage());
+                            }
+                            //parsing automatically does alpha conversion where necessary
+                            
+                            //parsing automatically does alpha conversion where necessary
+                            Debug("compareStr: " + compareStr);
+                            
+                            if(compareStr.equals(prevStr)){
+                                Debug("award half mark(s) for reasoning (compareStr.equals(prevStr)): ");
+                                Debug("alphaChanges.length/2: " + alphaChanges.length/2.0);
+                                if(curr.getReduction()=='>'||curr.getReduction()=='→'){
+                                    Debug("CONVERSION corret");//no marks for conversion
+                                }else
+                                    curr.addMark(alphaChanges.length/2.0);
+                                
+                                /*for (int i=0;i<alphaChanges.length;i++){
+                                    if(replacementCorrect[i] == true)
+                                        curr.addMark(1);
+                                }*/
+                            }else if(curr.getReduction()=='>'||curr.getReduction()=='→'){
+                                    //could be converting, in which case should equal currStr
+                                    if(compareStr.equals(currStr)){
+                                        Debug("CONVERSION correct");//no marks for conversion
+                                    }
+                            }else{
+                                /*for (int i=0;i<alphaChanges.length;i++){
+                                    compareStr = compareStr.replace(targets[i],replacements[i]);
+                                }
+                                try {
+                                    compareStr = Parser.parse(compareStr).toString();
+                                } catch (Parser.ParseException pe) {
+                                    System.out.println(pe.getMessage());
+                                }
+                                Debug("compareStr (2nd try): " + compareStr);
+                                if(compareStr.equals(prevStr)){
+                                    Debug("compareStr.equals(prevStr)");
+                                    Debug("award mark for reasoning: ");
+                                    Debug("alphaChanges.length/2: " + alphaChanges.length/2.0);
+                                    curr.addMark(alphaChanges.length/2.0);
+                                }
+                                */
+                            }
+                            
+                                /*
+                                foundRelation = false;
+                                for(int j=0;j<targets.length;j++){
+                                    //check if target replaced by iX is same as before after parsing 
+                                    //parsing auto alpha converts where necessary
+                                    
+                                    compareStr = prevStr.replace("i"+i,targets[j]);
+                                    Debug("compareStr before parse: " + compareStr);
+                                    try {
+                                        compareStr = Parser.parse(compareStr).toString();
+                                    } catch (Parser.ParseException pe) {
+                                        System.out.println(pe.getMessage());
+                                    }
+                                    Debug("compareStr: " + compareStr);
+                                    if(compareStr.equals(prevStr)){
+                                        Debug("compareStr.equals(prevStr) i" + i + "\t" + targets[j]);
+                                        
+                                        iToTarget.put(targets[j], "i"+i);
+                                        foundRelation = true;
+                                        //break;
+                                    }
+                                }
+                                */
+                            
+                            
+                            //could replace all iX's with targets in diff combinations to determine correctness
+                            /*
+                            for(int i=0;i<alphaChanges.length;i++){
+                                
+                                target = iToTarget.get(targets[i]); //get iX which corresponds to target (as determined above)
+                                replacement = replacements[i];
+
+
+                                Debug("target: " + target);
+                                Debug("replacement: " + replacement);
+
+                                int countTargetBefore = 0;
+                                int countTargetAfter = 0;
+                                int countReplacementBefore = 0;
+                                int countReplacementAfter = 0;
+                                int targetIndex = 0;
+                                int indexReplace = 0;
+
+                                while(targetIndex>-1&&indexReplace>-1){
+                                    targetIndex = prevStr.indexOf(target,targetIndex);
+                                    if(targetIndex>-1)
+                                        countTargetBefore += 1;
+                                    indexReplace = prevStr.indexOf(replacement,indexReplace);
+                                    if(indexReplace>-1)
+                                        countReplacementBefore += 1;
+                                }
+
+                                targetIndex = 0;
+                                indexReplace = 0;
+                                while(targetIndex>-1&&indexReplace>-1){
+                                    targetIndex = currStr.indexOf(target,targetIndex);
+                                    if(targetIndex>-1)
+                                        countTargetAfter += 1;
+                                    indexReplace = currStr.indexOf(replacement,indexReplace);
+                                    if(indexReplace>-1)
+                                        countReplacementAfter += 1;
+                                }
+                                Debug("countTargetBefore: " + countTargetBefore);
+                                Debug("countTargetAfter: " + countTargetAfter);
+                                Debug("countReplacementBefore: " + countReplacementBefore);
+                                Debug("countReplacementAfter: " + countReplacementAfter);
+
+                                if((countTargetBefore-countTargetAfter)==(countReplacementAfter-countReplacementBefore)){
+                                    Debug("award mark for reasoning");
+                                    curr.addMark(1);
+                                }
+                            }
+                            */
+                           /* int replacementOffset = 0;
+                            boolean goodLine = true;
+                            for (int i=0;i<prevStr.length();i++){
+                                if(prevStr.charAt(i)!=currStr.charAt(i)){
+                                    Debug(prevStr.substring(i+replacementOffset,i+replacementOffset+target.length()) + " vs " + target);
+                                    if(prevStr.substring(i,i+target.length()).equals(target)){
+                                        Debug(currStr.substring(i,i+replacement.length()) + " vs " + replacement);
+                                        if(currStr.substring(i+replacementOffset,i+replacementOffset+replacement.length()).equals(replacement)){
+                                            replacementOffset+= replacement.length()-target.length();
+                                        }else{
+                                            goodLine = false;
+                                            break;
+                                        }
+                                    }else{
+                                        goodLine = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            Debug("goodLine: " + goodLine);
+                            */
+                            break;
+                        case 'b':
+                        case 'B':
+                        case 'β':
+                            Debug("BETA");
+                            if(replacement.contains("\\")||replacement.contains("λ")){
+                                if(replacement.charAt(0)!='('){
+                                    Debug("lambda expression, but not with parentheses");
+                                    replacement = "(" + replacement + ")";//add brackets
+                                    //break;
+                                }
+                            }
+                            int pNum = 1;
+                            int indexTarget = prevStr.indexOf("\\"+target);//find bound var if Normal
+                            if(require.equals("Applicative")){
+                                //indexTarget = prevStr.lastIndexOf("\\"+target);
+                                //works better without
+                            }
+                            int numIReplace = 1;
+                            String tempPrevStr = prevStr;
+                            if(indexTarget<0&&tempPrevStr.contains("i0")){
+                                //if target is the same as replacement, calculator may have alpha converted (unnecssarily perhaps)
+                                tempPrevStr = tempPrevStr.replace("i0",target);
+                                indexTarget = tempPrevStr.indexOf("\\"+target);//find bound var if Normal
+                                while(tempPrevStr.contains("i"+numIReplace)){
+                                    tempPrevStr=tempPrevStr.replace("i"+numIReplace,"i"+(numIReplace-1));
+                                    numIReplace+=1;
+                                }
+                            }
+                            Debug("prevStr: " + prevStr);
+                            Debug("tempPrevStr: " + tempPrevStr);
+                            prevStr = tempPrevStr;
+                            int initialIndex = indexTarget;
+                            Debug("indexTarget: " + indexTarget);
+                            if(indexTarget>0){
+                                int p=indexTarget;
+                                char cP = prevStr.charAt(p-1);
+                                if(cP=='('){
+                                    newStr = prevStr.substring(0,indexTarget-1);
+                                }else{
+                                    newStr = prevStr.substring(0,indexTarget);
+                                }
+                                p=p+target.length()+2; //move to past '.' of lambda expression
+                                Debug("newStr from prevStr: " + newStr);
+                                while(pNum>0){
+                                    cP = prevStr.charAt(p);
+                                    if(cP == '('){
+                                        pNum+=1;
+                                        newStr=newStr+cP;
+                                    }else if(cP == ')'){
+                                        pNum-=1;
+                                        if(pNum<1)
+                                            break;
+                                        newStr=newStr+cP;
+                                    }else if(prevStr.substring(p,p+target.length()).equals(target)){
+                                        newStr=newStr+replacement;    
+                                    }
+                                    else{
+                                        newStr=newStr+cP;
+                                    }
+                                    p+=1;
+                                }
+                                Debug("newStr: " + newStr);
+                                
+                                if(currStr.charAt(0)=='(')
+                                    newStr = "(" + newStr + ")";//add parentheses for separation and maintenance of logic
+                                
+                                Debug(prevStr.length() + " >? " + (p+3+replacement.length()));
+                                if(prevStr.length()>(p+3+replacement.length())){
+                                    newStr = newStr + " " + prevStr.substring(p+3+replacement.length());//3: 1 for parenthesis, 1 for space, 1 for last p not added
+                                }
+                            }
+                            
+                            Debug("newStr: " + newStr + " length: " + newStr.length());
+                            String newStrParsed = null;
+                            while(newStrParsed==null&&newStr.length()>1){
+                                try {
+                                    newStrParsed = Parser.parse(newStr).toString();
+                                } catch (Parser.ParseException pe) {
+                                    Debug("ParseException: " + pe.getMessage());
+                                    if(pe.getMessage().equals("Right parenthesis missing")){
+                                        newStr = newStr.substring(0,initialIndex-1) + newStr.substring(initialIndex);
+                                        Debug("newStr: " + newStr);
+                                        initialIndex-=1;//for further right parenthesis missing errors
+                                    }else if(newStr.charAt(newStr.length()-1)==')'){
+                                        newStr = newStr.substring(0,newStr.length()-2);
+                                    }
+                                    else{
+                                        newStrParsed="";
+                                    }
+                                }
+                            }
+
+                            Debug("newStrParsed: " + newStrParsed);
+                            if(newStr.equals(currStr)||(newStrParsed!=null && newStrParsed.equals(currStr))){
+                                Debug("award mark for reasoning");
+                                curr.addMark(1);
+                            }
+
+                            break;    
+                        case 'n':
+                        case 'η':
+                            Debug("ETA");
+                            Debug("award mark for reasoning");
+                            curr.addMark(1);
+                            break;
+                        //case '>':
+                        //case '→':
+                        //    Debug("CONVERSION");
+
+                        //    break;
+                        default:
+                            break;
+                    }
+                }    
+                if(!markAwarded){ 
+                        //&& (curr.getReduction()=='B'||curr.getReduction()=='b'||curr.getReduction()=='β')){
                     markPenalty+=1;
                 }
-                
+                Debug("line mark: " + curr.getMark());
                 prev = curr;
                 
             }
             sol.setMark(markPenalty);
             
-            Debug(sol);
-            Debug("Mark penalty: " + markPenalty + "\n\n-------------------------");
+            Debug("------------------------------\n" + sol);
+            Debug("Mark penalty: " + markPenalty + "\n\n---------------------------------------------------------------------------");
         }
     }
     

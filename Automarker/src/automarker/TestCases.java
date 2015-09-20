@@ -111,11 +111,43 @@ class TestCases {
                 solutionList.add(alphaTest16());
                 if(!index.equals("all")&&!index.equals("alpha"))
                     break;
+            case "a17":
+                solutionList.add(alphaTest17());
+                if(!index.equals("all")&&!index.equals("alpha"))
+                    break;
+            case "a18":
+                solutionList.add(alphaTest18());
+                if(!index.equals("all")&&!index.equals("alpha"))
+                    break;
+            case "a19":
+                solutionList.add(alphaTest19());
+                if(!index.equals("all")&&!index.equals("alpha"))
+                    break;
+            case "a20":
+                solutionList.add(alphaTest20());
+                if(!index.equals("all")&&!index.equals("alpha"))
+                    break;
             case "beta":
                 if(index.equals("alpha"))
                     break;
             case "b1":
                 solutionList.add(betaTestOne());
+                if(!index.equals("all")&&!index.equals("beta"))
+                    break;
+            case "b2":
+                solutionList.add(betaTestTwo());
+                if(!index.equals("all")&&!index.equals("beta"))
+                    break;
+            case "b3":
+                solutionList.add(betaTestThree());
+                if(!index.equals("all")&&!index.equals("beta"))
+                    break;
+            case "b4":
+                solutionList.add(betaTestFour());
+                if(!index.equals("all")&&!index.equals("beta"))
+                    break;
+            case "b5":
+                solutionList.add(betaTestFive());
                 if(!index.equals("all")&&!index.equals("beta"))
                     break;
             case "eta":
@@ -125,6 +157,31 @@ class TestCases {
                 solutionList.add(etaTestOne());
                 if(!index.equals("all")&&!index.equals("eta"))
                     break;
+            case "conversion":
+                if(index.equals("eta")){
+                    break;
+                }
+            case "c1":
+                solutionList.add(conversionTestOne());
+                if(!index.equals("all")&&!index.equals("conversion"))
+                    break;
+            /*case "c2":
+                solutionList.add(conversionTestTwo());
+                if(!index.equals("all")&&!index.equals("conversion"))
+                    break;
+            case "c3":
+                solutionList.add(conversionTestThree());
+                if(!index.equals("all")&&!index.equals("conversion"))
+                    break;
+            case "c4":
+                solutionList.add(conversionTestFour());
+                if(!index.equals("all")&&!index.equals("conversion"))
+                    break;
+            case "c5":
+                solutionList.add(conversionTestFive());
+                if(!index.equals("all")&&!index.equals("conversion"))
+                    break;
+            */
             default:
                 System.out.println("no such test");
                 break;
@@ -146,16 +203,16 @@ class TestCases {
                         Final mark: 3.0 out of 3.0
      */
     private static Solution alphaTestOne(){
-        String descrip = "A1:3";
+        String descrip = "A1:6";
         String require = "";
         String start = "(λx.λy. x y)(λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv. x v)(λx.x y z)",'a',"y/v"));
+        lineArr.add(new Line("(λx.λv. x v)(λx.x y z)",'a',"v/y"));
         lineArr.add(new Line("λv.(λx.x y z) v",'b',"(λx.x y z)/x"));
         lineArr.add(new Line("λv.v y z",'b',"v/x"));   //ETA disabled
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -170,16 +227,16 @@ class TestCases {
      * @expected_output 
      */
     private static Solution alphaTestTwo(){
-        String descrip = "A2:1.5";  
+        String descrip = "A2:3";  
         String require = "";
         String start = "(λx.λy. x y)(λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λy. x y)(λx.x v z)",'a',"y/v")); //wrong - changed free var
+        lineArr.add(new Line("(λx.λy. x y)(λx.x v z)",'a',"v/y")); //wrong - changed free var
         lineArr.add(new Line("λy.(λx.x v z) y",'b',"(λx.x y z)/x"));
         lineArr.add(new Line("λy.y v z",'b',"y/x"));  //wrong from expected result
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -194,16 +251,16 @@ class TestCases {
      * @expected_output 
      */
     private static Solution alphaTestThree(){
-        String descrip = "A3:1.5";  
+        String descrip = "A3:3";  
         String require = "";
         String start = "(λx.λy. x y)(λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv. x y)(λx.x y z)",'a',"y/v")); //wrong - changed only lambda part
+        lineArr.add(new Line("(λx.λv. x y)(λx.x y z)",'a',"v/y")); //wrong - changed only lambda part
         lineArr.add(new Line("λv.(λx.x y z) y",'b',"(λx.x y z)/x"));
         lineArr.add(new Line("λv.y y z",'b',"y/x"));  //wrong from expected result
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -213,16 +270,16 @@ class TestCases {
      * @expected_output \
      */
     private static Solution alphaTestFour(){
-        String descrip = "A4:3";
+        String descrip = "A4:6";
         String require = "";
         String start = "(λx.λy.x y y) (λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv. x v v)(λx.x y z)",'a',"y/v"));
+        lineArr.add(new Line("(λx.λv. x v v)(λx.x y z)",'a',"v/y"));
         lineArr.add(new Line("λv.(λx.x y z) v v",'b',"(λx.x y z)/x"));
         lineArr.add(new Line("λv.v y z v",'b',"v/x"));   //ETA disabled
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -232,16 +289,16 @@ class TestCases {
      * @expected_output \
      */
     private static Solution alphaTestFive(){
-        String descrip = "A5:1.5";
+        String descrip = "A5:3";
         String require = "";
         String start = "(λx.λy.x y y) (λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv. x v y)(λx.x y z)",'a',"y/v"));    //wrong - changed only 1st bound var
+        lineArr.add(new Line("(λx.λv. x v y)(λx.x y z)",'a',"v/y"));    //wrong - changed only 1st bound var
         lineArr.add(new Line("λv.(λx.x y z) v y",'b',"(λx.x y z)/x"));
         lineArr.add(new Line("λv.v y z y",'b',"v/x"));   //ETA disabled
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -251,16 +308,16 @@ class TestCases {
      * @expected_output \
      */
     private static Solution alphaTestSix(){
-        String descrip = "A6:1.5";
+        String descrip = "A6:3";
         String require = "";
         String start = "(λx.λy.x y y) (λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv. x y v)(λx.x y z)",'a',"y/v"));    //wrong - changed only 2nd bound var
+        lineArr.add(new Line("(λx.λv. x y v)(λx.x y z)",'a',"v/y"));    //wrong - changed only 2nd bound var
         lineArr.add(new Line("λv.(λx.x y z) y v",'b',"(λx.x y z)/x"));
         lineArr.add(new Line("λv.y y z v",'b',"y/x"));   //ETA disabled
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -273,17 +330,17 @@ class TestCases {
      * @expected_output 
      */
     private static Solution alphaTestSeven(){
-        String descrip = "A7:1.33";
+        String descrip = "A7:4";
         String require = "";
         String start = "(λx.λy.λz. x y)(λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv.λz. x v)(λx.x y z)",'a',"y/v"));   //needed to change both y and z
+        lineArr.add(new Line("(λx.λv.λz. x v)(λx.x y z)",'a',"v/y"));   //needed to change both y and z
         lineArr.add(new Line("λv.λz.(λx.x y z) v",'b',"(λx.x y z)/x"));
-        lineArr.add(new Line("λv.λu.(λx.x y z) v",'a',"z/u"));//only changed 1 z, which is correct  overall but wrong in context
+        lineArr.add(new Line("λv.λu.(λx.x y z) v",'a',"u/z"));//only changed 1 z, which is correct  overall but wrong in context
         lineArr.add(new Line("λv.λu.v y z",'b',"v/x"));  
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -295,16 +352,16 @@ class TestCases {
      * @expected_output 
      */
     private static Solution alphaTestEight(){
-        String descrip = "A8:4";
+        String descrip = "A8:8";
         String require = "";
         String start = "(λx.λy.λz. x y)(λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv.λu. x v)(λx.x y z)",'a',"y/v,z/u"));
+        lineArr.add(new Line("(λx.λv.λu. x v)(λx.x y z)",'a',"v/y,u/z"));
         lineArr.add(new Line("λv.λu.(λx.x y z) v",'b',"(λx.x y z)/x"));
         lineArr.add(new Line("λv.λu.v y z",'b',"v/x")); 
         
-        return new Solution(new Question(descrip,4,require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,8,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -316,21 +373,21 @@ class TestCases {
      * @expected_output 
      */
     private static Solution alphaTestNine(){
-        String descrip = "A9:1.33";
+        String descrip = "A9:4";
         String require = "";
         String start = "(λx.λy.λz. x y)(λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv.λz. x v)(λx.x y z)",'a',"y/v"));   //didn't change z
+        lineArr.add(new Line("(λx.λv.λz. x v)(λx.x y z)",'a',"v/y"));   //didn't change z
         lineArr.add(new Line("λv.λz.(λx.x y z) v",'b',"(λx.x y z)/x"));
-        lineArr.add(new Line("λv.λu.(λx.x y u) v",'a',"z/u"));  //at this point, souldn't change z to u - redundant
+        lineArr.add(new Line("λv.λu.(λx.x y u) v",'a',"u/z"));  //at this point, souldn't change z to u - redundant
         lineArr.add(new Line("λv.λu.v y u",'b',"v/x"));  
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     /***
      * two alpha conversions required
-     * only one alpha conversion done
+     * only one alpha conversion done (wrong) Half mark for correct reasoning
      * beta reductions done correctly, but final answer wrong
      * 
      * Wrong answer
@@ -338,16 +395,16 @@ class TestCases {
      * @expected_output 
      */
     private static Solution alphaTest10(){
-        String descrip = "A10:2";
+        String descrip = "A10:3.5";
         String require = "";
         String start = "(λx.λy.λz. x y)(λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv.λz. x v)(λx.x y z)",'a',"y/v"));   //didn't change z
+        lineArr.add(new Line("(λx.λv.λz. x v)(λx.x y z)",'a',"v/y"));   //didn't change z
         lineArr.add(new Line("λv.λz.(λx.x y z) v",'b',"(λx.x y z)/x"));
         lineArr.add(new Line("λv.λz.v y z",'b',"v/x"));  
         
-        return new Solution(new Question(descrip,4,require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,8,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -364,19 +421,19 @@ class TestCases {
      * @expected_output
      */
     private static Solution alphaTest11(){
-        String descrip = "A11:6";
+        String descrip = "A11:12";
         String require = "";
         String start = "((λx.λy.λz. x y)(λx.x y) λz.z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λz.z)",'a',"y/v"));     
-        lineArr.add(new Line("((λv.λz. (λx.x y) v) λz.z)",'b',"(λx.x y z)/x"));
+        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λz.z)",'a',"v/y"));     
+        lineArr.add(new Line("((λv.λz. (λx.x y) v) λz.z)",'b',"(λx.x y)/x"));
         lineArr.add(new Line("(λz. (λx.x y) λz.z)",'b',"(λz.z)/v"));
-        lineArr.add(new Line("(λz. (λx.x y) λu.u)",'a',"z/u"));
+        lineArr.add(new Line("(λz. (λx.x y) λu.u)",'a',"u/z"));
         lineArr.add(new Line("(λz. (λu.u) y)",'b',"(λu.u)/x")); 
         lineArr.add(new Line("λz. y",'b',"y/u"));
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -395,19 +452,19 @@ class TestCases {
      * @expected_output
      */
     private static Solution alphaTest12(){
-        String descrip = "A12:6";
+        String descrip = "A12:12";
         String require = "";
         String start = "((λx.λy.λz. x y)(λx.x y) λz.z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λz.z)",'a',"y/v"));     
-        lineArr.add(new Line("((λv.λz. (λx.x y) v) λz.z)",'b',"(λx.x y z)/x"));
-        lineArr.add(new Line("((λv.λz. (λx.x y) v) λu.u)",'a',"z/u"));   //don't need to do at this point, but still correct
+        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λz.z)",'a',"v/y"));     
+        lineArr.add(new Line("((λv.λz. (λx.x y) v) λz.z)",'b',"(λx.x y)/x"));
+        lineArr.add(new Line("((λv.λz. (λx.x y) v) λu.u)",'a',"u/z"));   //don't need to do at this point, but still correct
         lineArr.add(new Line("(λz. (λx.x y) λu.u)",'b',"(λu.u)/v")); 
         lineArr.add(new Line("(λz. (λu.u) y)",'b',"(λu.u)/x")); 
         lineArr.add(new Line("λz. y",'b',"y/u"));
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -427,18 +484,18 @@ class TestCases {
      * @expected_output
      */
     private static Solution alphaTest13(){
-        String descrip = "A13:6";
+        String descrip = "A13:12";
         String require = "";
         String start = "((λx.λy.λz. x y)(λx.x y) λz.z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λu.u)",'a',"y/v,z/u"));     
-        lineArr.add(new Line("((λv.λz. (λx.x y) v) λu.u)",'b',"(λx.x y z)/x"));
+        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λu.u)",'a',"v/y,u/z"));     
+        lineArr.add(new Line("((λv.λz. (λx.x y) v) λu.u)",'b',"(λx.x y)/x"));
         lineArr.add(new Line("(λz. (λx.x y) λu.u)",'b',"(λu.u)/v")); 
         lineArr.add(new Line("(λz. (λu.u) y)",'b',"(λu.u)/x")); 
         lineArr.add(new Line("λz. y",'b',"y/u"));
         
-        return new Solution(new Question(descrip,6,require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,12,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -459,18 +516,18 @@ class TestCases {
      * @expected_output
      */
     private static Solution alphaTest14(){
-        String descrip = "A14:6";
+        String descrip = "A14:12";
         String require = "";
         String start = "((λx.λy.λz. x y)(λx.x y) λz.z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("((λx.λv.λu. x v)(λx.x y) λz.z)",'a',"y/v,z/u"));     
-        lineArr.add(new Line("((λv.λu. (λx.x y) v) λz.z)",'b',"(λx.x y z)/x"));
+        lineArr.add(new Line("((λx.λv.λu. x v)(λx.x y) λz.z)",'a',"v/y,u/z"));     
+        lineArr.add(new Line("((λv.λu. (λx.x y) v) λz.z)",'b',"(λx.x y)/x"));
         lineArr.add(new Line("(λu. (λx.x y) λz.z)",'b',"(λz.z)/v")); 
         lineArr.add(new Line("(λu. (λz.z) y)",'b',"(λz.z)/x")); 
-        lineArr.add(new Line("λu. y",'b',"y/u"));
+        lineArr.add(new Line("λu. y",'b',"y/z"));
         
-        return new Solution(new Question(descrip,6,require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,12,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -489,19 +546,19 @@ class TestCases {
      * @expected_output
      */
     private static Solution alphaTest15(){
-        String descrip = "A15:6";
+        String descrip = "A15:12";
         String require = "";
         String start = "((λx.λy.λz. x y)(λx.x y) λz.z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λz.z)",'a',"y/v"));     
-        lineArr.add(new Line("((λv.λz. (λx.x y) v) λz.z)",'b',"(λx.x y z)/x"));
+        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λz.z)",'a',"v/y"));     
+        lineArr.add(new Line("((λv.λz. (λx.x y) v) λz.z)",'b',"(λx.x y)/x"));
         lineArr.add(new Line("(λz. (λx.x y) λz.z)",'b',"(λz.z)/v"));
-        lineArr.add(new Line("(λu. (λx.x y) λz.z)",'a',"z/u"));
+        lineArr.add(new Line("(λu. (λx.x y) λz.z)",'a',"u/z"));
         lineArr.add(new Line("(λu. (λz.z) y)",'b',"(λz.z)/x")); 
-        lineArr.add(new Line("λu. y",'b',"y/u"));
+        lineArr.add(new Line("λu. y",'b',"y/z"));
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -510,35 +567,102 @@ class TestCases {
      * 
      * Correct answer
      * 
-     * ((λx.λy.λz. x y)(λx.x y z) λz.z)
+     * @expected_output
+     */
+    private static Solution alphaTest16(){
+        String descrip = "A16:12";
+        String require = "";
+        String start = "((λx.λy.λz. x y)(λx.x y) λz.z)";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λz.z)",'a',"v/y"));     
+        lineArr.add(new Line("((λv.λz. (λx.x y) v) λz.z)",'b',"(λx.x y)/x"));
+        lineArr.add(new Line("((λv.λz. (λx.x y) v) λu.u)",'a',"u/z"));   //don't need to do at this point, but still correct
+        lineArr.add(new Line("(λz. (λx.x y) λu.u)",'b',"(λu.u)/v")); 
+        lineArr.add(new Line("(λz. (λu.u) y)",'b',"(λu.u)/x")); 
+        lineArr.add(new Line("λz. y",'b',"y/u"));
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+   
+   
+    //(λ b.b b)((λ a.a)(λ b.a b))
+    private static Solution alphaTest17(){
+        String descrip = "A17:12";
+        String require = "Normal";
+        String start = "(λb.b b)((λa.a)(λb.a b))";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("(λb.b b)((λc.c)(λb.a b))",'a',"c/a"));
+        lineArr.add(new Line("((λc.c)(λb.a b))((λc.c)(λb.a b))",'b',"((λc.c)(λb.a b))/b"));
+        //lineArr.add(new Line("(λc.c)(λb.a b)((λc.c)(λb.a b))",'b',"((λc.c)(λb.a b))/b")); //check if different?
+        lineArr.add(new Line("(λb.a b)((λc.c)(λb.a b))",'b',"(λb.a b)/c"));
+        lineArr.add(new Line("a ((λc.c)(λb.a b))",'b',"((λc.c)(λb.a b))/b"));
+        lineArr.add(new Line("a (λb.a b)",'b',"(λb.a b)/c"));
+        lineArr.add(new Line("a a",'n',"(λb.a b)/c"));
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+   
+    /***
+     * three alpha conversions required at start
+     *
+     *
+    ((λx.λy.λz. x y)(λx.x y z) λz.z)
+    ((λx.λy.λz. x y)(λx.x y z) λy.y)
         (λx.λi0.λi1.x i0) (λx.x y z) (λi0.i0)
        = (λi0.λi1.(λx.x y z) i0) (λi0.i0)
        = λi0.(λx.x y z) (λi1.i1)
        = λi0.(λi1.i1) y z
        = λi0.y z
-     * 
-     * @expected_output
-     */
-    private static Solution alphaTest16(){
-        String descrip = "A16:6";
-        String require = "";
-        String start = "((λx.λy.λz. x y)(λx.x y) λz.z)";
+    */
+     
+    private static Solution alphaTest18(){
+        String descrip = "A18:14";
+        String require = "Normal";
+        String start = "((λx.λy.λz. x y)(λx.x y z) λz.z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("((λx.λv.λz. x v)(λx.x y) λz.z)",'a',"y/v"));     
-        lineArr.add(new Line("((λv.λz. (λx.x y) v) λz.z)",'b',"(λx.x y z)/x"));
-        lineArr.add(new Line("((λv.λz. (λx.x y) v) λu.u)",'a',"z/u"));   //don't need to do at this point, but still correct
-        lineArr.add(new Line("(λz. (λx.x y) λu.u)",'b',"(λu.u)/v")); 
-        lineArr.add(new Line("(λz. (λu.u) y)",'b',"(λu.u)/x")); 
-        lineArr.add(new Line("λz. y",'b',"y/u"));
+        lineArr.add(new Line("((λx.λa.λb. x a)(λx.x y z) λc.c)",'a',"a/y,b/z,c/z"));
+        //lineArr.add(new Line("((λx.λa.λb. x a)(λx.x y z) λc.c)",'a',"a/y,c/z,b/z"));
+        lineArr.add(new Line("(λa.λb.(λx.x y z) a) (λc.c)",'b',"(λx.x y z)/x"));
+        lineArr.add(new Line("λb.(λx.x y z) (λc.c)",'b',"(λc.c)/a"));
+        lineArr.add(new Line("λb.(λc.c) y z",'b',"(λc.c)/x"));
+        lineArr.add(new Line("λb.y z",'b',"y/c"));
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,14,require,start),lineArr.toArray(new Line[1]));
     }
     
-    //((λx.λy.λz. x y)(λx.x y) λz.z)
-    //(λx.λy.λz. x y)(λx.x y) (λz.z) //equiv
-
-    //((λx.λy.λz. x y)(λx.x y) λz.z x)
+    private static Solution alphaTest19(){
+        String descrip = "A19:14";
+        String require = "Normal";
+        String start = "((λx.λy.λz. x y)(λx.x y z) λz.z)";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("((λx.λa.λb. x a)(λx.x y z) λc.c)",'a',"a/y,c/z,b/z")); //different order, still correct
+        lineArr.add(new Line("(λa.λb.(λx.x y z) a) (λc.c)",'b',"(λx.x y z)/x"));
+        lineArr.add(new Line("λb.(λx.x y z) (λc.c)",'b',"(λc.c)/a"));
+        lineArr.add(new Line("λb.(λc.c) y z",'b',"λc.c/x"));
+        lineArr.add(new Line("λb.y z",'b',"y/c"));
+        
+        return new Solution(new Question(descrip,14,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    private static Solution alphaTest20(){
+        String descrip = "A20:12.5";
+        String require = "Normal";
+        String start = "((λx.λy.λz. x y)(λx.x y z) λz.z)";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("((λx.λa.λb. x a)(λx.x y z) λc.c)",'a',"a/z,c/z,b/y")); //wrong alpha reasonings
+        lineArr.add(new Line("(λa.λb.(λx.x y z) a) (λc.c)",'b',"(λx.x y z)/x"));
+        lineArr.add(new Line("λb.(λx.x y z) (λc.c)",'b',"(λc.c)/a"));
+        lineArr.add(new Line("λb.(λc.c) y z",'b',"λc.c/x")); 
+        lineArr.add(new Line("λb.y z",'b',"y/c"));
+        
+        return new Solution(new Question(descrip,14,require,start),lineArr.toArray(new Line[1]));
+    }
+   
     
     //complex
     //(λx.λy.λz. x y)(λx.x y z (λz.λy.z y) x c)a b
@@ -586,7 +710,7 @@ class TestCases {
         
          
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     private static Solution betaTestOne(){
@@ -597,7 +721,77 @@ class TestCases {
         
         lineArr.add(new Line("λy.y y",'b',"y/x"));
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    //(λ b.b b)((λ a.a)(λ b.a b))
+    private static Solution betaTestTwo(){
+        String descrip = "B2:12";
+        String require = "Normal";
+        String start = "(λb.b b)((λa.a)(λb.a b))";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("(λb.b b)((λc.c)(λb.a b))",'a',"c/a"));
+        lineArr.add(new Line("((λc.c)(λb.a b))((λc.c)(λb.a b))",'b',"((λc.c)(λb.a b))/b"));
+        //lineArr.add(new Line("(λc.c)(λb.a b)((λc.c)(λb.a b))",'b',"((λc.c)(λb.a b))/b")); //check if different?
+        lineArr.add(new Line("(λb.a b)((λc.c)(λb.a b))",'b',"(λb.a b)/c"));
+        lineArr.add(new Line("a ((λc.c)(λb.a b))",'b',"((λc.c)(λb.a b))/b"));
+        lineArr.add(new Line("a (λb.a b)",'b',"(λb.a b)/c"));
+        lineArr.add(new Line("a a",'n',"(λb.a b)/c"));
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    //(λ b.b b)((λ a.a)(λ b.a b))
+    private static Solution betaTestThree(){
+        String descrip = "B3:10";
+        String require = "Applicative";
+        String start = "(λb.b b)((λa.a)(λb.a b))";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("(λb.b b)((λc.c)(λb.a b))",'a',"c/a"));
+        lineArr.add(new Line("(λb.b b)(λb.a b)",'b',"(λb.a b)/c"));
+        lineArr.add(new Line("(λb.a b)(λb.a b)",'b',"(λb.a b)/b"));
+        lineArr.add(new Line("a (λb.a b)",'b',"(λb.a b)/b"));
+        lineArr.add(new Line("a a",'n',"(λb.a b)/c"));
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    //(λ b.b b)((λ a.a)(λ b.a b))
+    private static Solution betaTestFour(){
+        String descrip = "B4:8";
+        String require = "Applicative";
+        String start = "(λb.b b)((λa.a)(λb.a b))";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("(λb.b b)((λc.c)(λb.a b))",'a',"c/a"));
+        lineArr.add(new Line("(λb.b b)((λc.c) a)",'n',"")); //eta
+        lineArr.add(new Line("(λb.b b) a ",'b',"a/c"));
+        lineArr.add(new Line("a a",'b',"a/b"));
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    //(λ b.b b)((λ a.a)(λ b.a b))
+    /***
+     * 
+     * no mention, but applicative
+     * 
+     */
+    private static Solution betaTestFive(){
+        String descrip = "B5:10";
+        String require = "";
+        String start = "(λb.b b)((λa.a)(λb.a b))";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("(λb.b b)((λc.c)(λb.a b))",'a',"c/a"));
+        lineArr.add(new Line("(λb.b b)(λb.a b)",'b',"(λb.a b)/c"));
+        lineArr.add(new Line("(λb.a b)(λb.a b)",'b',"(λb.a b)/b"));
+        lineArr.add(new Line("a (λb.a b)",'b',"(λb.a b)/b"));
+        lineArr.add(new Line("a a",'n',"(λb.a b)/c"));
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
     
     /***
@@ -610,16 +804,103 @@ class TestCases {
      */
     private static Solution etaTestOne(){
         /*  */
-        String descrip = "E1:3";
+        String descrip = "E1:6";
         String require = "";
         String start = "(λx.λy. x y)(λx.x y z)";
         List<Line> lineArr = new ArrayList<>();
         
-        lineArr.add(new Line("(λx.λv. x v)(λx.x y z)",'a',"y/v"));
-        lineArr.add(new Line("λv.(λx.x y z) v",'b',"(λx.x y z)/b"));
+        lineArr.add(new Line("(λx.λv. x v)(λx.x y z)",'a',"v/y"));
+        lineArr.add(new Line("λv.(λx.x y z) v",'b',"(λx.x y z)/x"));
         lineArr.add(new Line("λx.x y z",'n',""));   //ETA enabled
         
-        return new Solution(new Question(descrip,lineArr.size(),require,start),lineArr.toArray(new Line[1]));
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    /***
+     * 
+     * #Reduce the following in any order. Give the steps of β- α- η-reduction, labelling them correctly, and conclude with the simplest form or state “diverges” if it does not terminate. Indicate what is being substituted with the [ ] notation.
+            Let 	t = λx.λy.x 
+                    f = λx.λy.y 
+                    k = λx.λy.λz.(x y z)
+            Obtain the normal form of the following λ-expression if it has one: (i f x) (i t y z)
+            Hint: add all parentheses; it may be useful to use j = (i t y z) to abbreviate some of the expressions.
+            <20.0
+            >(k f x) (k t y z)
+     * 
+     * Correct answer
+     * 
+     * model answer:
+     *  (((i f) x) ((i t) y) z) ; Adding all parentheses if they want
+            = (λx.λy.λz.x y z) f x j ; expanding first i
+                                     ; and substituting j as suggested
+        1. => (λy.λz.f y z) x j ; [f/x]
+        2. => (λz.f x z) j ; [x/y]
+        3. => f x j ; [j/z]
+        = (λx.λy.y) x j ; expand f
+        4. => (λy.y) j ; [x/x] and discarded
+        5. => j ; [j/y] identity
+        = (λx.λy.λz.x y z) t y z ; expand j
+        6. => (λy.λz.t y z) y z ; [t/x]
+        7. => (λz.t y z) z ; [y/y]
+        8. => t y z ; [z/z]
+        = (λx.λy.x) y z ; expand t
+        9. →α (λx.λa.x) y z ; α conversion to stop second free y being captured
+        10. => (λa.y) z ; [y/x]
+        11. => y ; [z/a] and discarded.
+     * 
+     */
+    private static Solution conversionTestOne(){
+        /*  */
+        String descrip = "C1:22";
+        String require = "";
+        String start = "(k f x) (k t y z)";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("(k f x) j",'>',"j/(k t y z)"));
+        lineArr.add(new Line("(λx.λy.λz.x y z) f x j",'>',"(λx.λy.λz.x y z)/k"));
+        lineArr.add(new Line("(λy.λz.f y z) x j",'b',"f/x"));
+        lineArr.add(new Line("(λz.f x z) j",'b',"x/y"));
+        lineArr.add(new Line("f x j",'b',"j/z"));
+        lineArr.add(new Line("(λx.λy.y) x j",'>',"(λx.λy.y)/f"));
+        lineArr.add(new Line("(λy.y) j",'b',"x/x"));
+        lineArr.add(new Line("j",'b',"j/y"));
+        lineArr.add(new Line("(λx.λy.λz.x y z) t y z ",'>',"(λx.λy.λz.x y z) t y z/j"));
+        lineArr.add(new Line("(λy.λz.t y z) y z",'b',"t/x"));
+        lineArr.add(new Line("(λz.t y z) z",'b',"y/y"));
+        lineArr.add(new Line("t y z",'b',"z/z"));
+        lineArr.add(new Line("(λx.λy.x) y z",'>',"(λx.λy.x)/t"));
+        lineArr.add(new Line("(λx.λa.x) y z",'a',"a/y"));
+        lineArr.add(new Line("(λa.y) z ",'b',"y/x"));
+        lineArr.add(new Line("y ",'b',"z/a"));
+        
+        return new Solution(new Question(descrip,22,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    private static Solution conversionTestTwo(){
+        /*  */
+        String descrip = "C1:22";
+        String require = "Applicative";
+        String start = "(k f x) (k t y z)";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("(k f x) j",'>',"j/(k t y z)"));
+        lineArr.add(new Line("(λx.λy.λz.x y z) f x j",'>',"(λx.λy.λz.x y z)/k"));
+        lineArr.add(new Line("(λy.λz.f y z) x j",'b',"f/x"));
+        lineArr.add(new Line("(λz.f x z) j",'b',"x/y"));
+        lineArr.add(new Line("f x j",'b',"j/z"));
+        lineArr.add(new Line("(λx.λy.y) x j",'>',"(λx.λy.y)/f"));
+        lineArr.add(new Line("(λy.y) j",'b',"x/x"));
+        lineArr.add(new Line("j",'b',"j/y"));
+        lineArr.add(new Line("(λx.λy.λz.x y z) t y z ",'>',"(λx.λy.λz.x y z) t y z/j"));
+        lineArr.add(new Line("(λy.λz.t y z) y z",'b',"t/x"));
+        lineArr.add(new Line("(λz.t y z) z",'b',"y/y"));
+        lineArr.add(new Line("t y z",'b',"z/z"));
+        lineArr.add(new Line("(λx.λy.x) y z",'>',"(λx.λy.x)/t"));
+        lineArr.add(new Line("(λx.λa.x) y z",'a',"a/y"));
+        lineArr.add(new Line("(λa.y) z ",'b',"y/x"));
+        lineArr.add(new Line("y ",'b',"z/a"));
+        
+        return new Solution(new Question(descrip,22,require,start),lineArr.toArray(new Line[1]));
     }
     
 }
