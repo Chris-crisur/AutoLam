@@ -22,6 +22,7 @@ public class SummaryReport extends Report{
             totalMark += sol.getMark();
         }
     }
+<<<<<<< HEAD
     
     public void setTotalMark(double totalMark) {
         this.totalMark = totalMark;
@@ -44,7 +45,30 @@ public class SummaryReport extends Report{
         report.add("\nTotal mark: \t " + totalMark);
         
         return report;
+=======
+
+    public double getTotalMark() {
+        return totalMark;
     }
     
+    public String getReport(){
+        StringBuilder sb = new StringBuilder();
+        double maxMark = 0;
+        for(Solution sol: solutions){
+            sb.append(sol.toString()).append("\n");
+            maxMark += sol.getQuestion().getMaxMark();
+        }
+        
+        sb.append("Total mark: ").append(totalMark).append(" out of ").append(maxMark)
+                .append("\nPercentage: ").append(totalMark*100.00/maxMark);
+        
+        return sb.toString();
+>>>>>>> ac2c3d9245ec1ccb95c1490fe769d24cb9a3d88e
+    }
+    
+    @Override
+    public String toString(){
+        return getReport();
+    }
     
 }

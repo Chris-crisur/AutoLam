@@ -32,6 +32,11 @@ public class Student extends Person{
     
     public double getMark()
     {
+<<<<<<< HEAD
+=======
+        if(mark==0)
+            report.getTotalMark();
+>>>>>>> ac2c3d9245ec1ccb95c1490fe769d24cb9a3d88e
         return mark;
     }
     
@@ -47,7 +52,11 @@ public class Student extends Person{
     
     @Override
     public String toString(){
+<<<<<<< HEAD
         return studentNum + ": " + getName() + "\n" + getSummaryReport();
+=======
+        return studentNum + ": " + getName() + "\n" + getSummaryReport().getReport();
+>>>>>>> ac2c3d9245ec1ccb95c1490fe769d24cb9a3d88e
     }
     
 }
