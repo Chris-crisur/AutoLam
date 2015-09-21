@@ -19,17 +19,17 @@ public class Solution {
     private int id;
     private Question question;
     private Line [] lines;
+    private String dateCreated;     //TODO: change to formatted date
     private String dateSubmitted;   //TODO: change to formatted date
     private double mark;
-    private int penalty;
     
     public Solution(Question question, Line [] lines){
         idCount += 1;
         id = idCount;
         this.question = question;
         this.lines = lines;
+        dateCreated = "date"; //System.getTimeInMillis();
         mark=0;
-        penalty=1;
     }
 
     public int getID(){
@@ -73,6 +73,14 @@ public class Solution {
         this.lines = lines;
     }
 
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
     public String getDateSubmitted() {
         return dateSubmitted;
     }
@@ -89,7 +97,6 @@ public class Solution {
         if(mark>question.getMaxMark()/markPen){
             mark = question.getMaxMark()/markPen;
         }
-        penalty = markPen;
     }
 
     public double getMark(){
@@ -100,18 +107,19 @@ public class Solution {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Solution " + id +
+                "\nDate Created: " + dateCreated +
                 "\nDate Submitted: " + dateSubmitted +
                 "\nQuestion: " + question.toString() +
                 "\nAnswer: \n");
         for (Line line : lines) {
             sb.append(line).append("\n");
         }
-        sb.append("Final mark: ").append(mark).append(" out of ").append(question.getMaxMark()).append("\t penalty: " + (penalty-1));
+        sb.append("Final mark: ").append(mark).append(" out of ").append(question.getMaxMark());
         return sb.toString();
     }
 
     public String toStringTechnical(){
-        return "Solution{" + "id=" + id + ", question=" + question + ", lines=" + lines + ", dateSubmitted=" + dateSubmitted + '}';
+        return "Solution{" + "id=" + id + ", question=" + question + ", lines=" + lines + ", dateCreated=" + dateCreated + ", dateSubmitted=" + dateSubmitted + '}';
     }
 
     public String outputFormat(){

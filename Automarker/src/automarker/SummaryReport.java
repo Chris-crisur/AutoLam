@@ -12,28 +12,38 @@ import java.util.*;
  * @author Annie
  */
 public class SummaryReport extends Report{
+    private Solution [] solutions;
     private double totalMark;
-    private ArrayList<Question> questions;
 
-    public SummaryReport(Date dateCreated) {
+    public SummaryReport(Date dateCreated, Solution [] solutions) {
         super(dateCreated);
+        this.solutions = solutions;
+        for(Solution sol: solutions){
+            totalMark += sol.getMark();
+        }
     }
 
     public double getTotalMark() {
         return totalMark;
     }
-
-    public void setTotalMark(double totalMark) {
-        this.totalMark = totalMark;
-    }
-
-    public ArrayList<Question> getQuestion() {
-        return questions;
-    }
-
-    public void setQuestion(ArrayList<Question> questions) {
-        this.questions = questions;
+    
+    public String getReport(){
+        StringBuilder sb = new StringBuilder();
+        double maxMark = 0;
+        for(Solution sol: solutions){
+            sb.append(sol.toString()).append("\n");
+            maxMark += sol.getQuestion().getMaxMark();
+        }
+        
+        sb.append("Total mark: ").append(totalMark).append(" out of ").append(maxMark)
+                .append("\nPercentage: ").append(totalMark*100.00/maxMark);
+        
+        return sb.toString();
     }
     
+    @Override
+    public String toString(){
+        return getReport();
+    }
     
 }

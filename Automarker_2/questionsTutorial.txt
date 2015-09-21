@@ -1,0 +1,21 @@
+#Reduce the following in any order. Give the steps of β- α- η-reduction, labelling them correctly, and conclude with the simplest form or state “diverges” if it does not terminate. Indicate what is being substituted with the [ ] notation.
+Let 	t = λx.λy.x 
+	f = λx.λy.y 
+	i = λx.λy.λz.(x y z)
+Obtain the normal form of the following λ-expression if it has one: (i f x) (i t y z)
+Hint: add all parentheses; it may be useful to use j = (i t y z) to abbreviate some of the expressions.
+<20.0
+>(i f x) (i t y z)
+#Reduce the following in normal order. That is, reduce the outermost, leftmost redex first. Give the steps of β- α- η-reduction, labelling them correctly, and conclude with the simplest form. 
+(λx.(*(* x x) x))((λy.(+ y 1)) 2)
+Perform any arithmetic using the normal rules of arithmetic as a separate step, i.e., do not convert to λ expressions, but write 6 instead of, say, (* 2 3) in the next step. Stick to the normal order indicated and only perform the arithmetic when normal order requires that arithmetic function be reduced. Label each step with what you have done. Indicate what is being substituted with the [ ] notation.
+<12.5
+!Normal
+>(λx.(*(* x x) x))((λy.(+ y 1)) 2)
+#Reduce the following in applicative order (the innermost redex first). Perform any arithmetic using the normal rules of arithmetic, i.e., do not convert to λ expressions but stick to the order indicated (applicative l). Label each step with what you have done, including substitutions.
+Give the steps of β- α- η-reduction, labelling them correctly, and conclude with the simplest form or state “diverges” if it does not terminate.
+(λx.(*(* x x) x))((λy.(+ y 1)) 2)
+Hint: the first step is to figure out what is innermost.
+<11.0
+!Applicative
+>(λx.(*(* x x) x))((λy.(+ y 1)) 2)

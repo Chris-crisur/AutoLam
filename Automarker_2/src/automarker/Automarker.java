@@ -28,24 +28,21 @@ public class Automarker {
     private boolean debug = true;
     private Solution [] solutions;
     private List<String> finalResultsList;
-    private Student student;
-    private BufferedWriter writer;
+    Student student;
+    BufferedWriter writer;
     
     public Automarker(String stdSolution){
         
         student = null;
-        loadFile(stdSolution);
+        loadFiles(stdSolution);
         
         markSolutions();
         
         //check tests
-       // performTests("all");
+        performTests("all");
         
         if (student!=null){
-            student.setSolutions(solutions);
             createReport();
-        }else{
-            System.err.println("error with student creation");
         }
         
     }
@@ -69,32 +66,25 @@ public class Automarker {
         }
     }
     
-    private void loadFile(String fName){
+    private void loadFiles(String stdSolutions){
         
         boolean sLoaded = false;
         //read solutions from txt file
         //select a file to be read
-        String studNum=null, studName=null,line="", sol="", quest="",require="", start="", answer="", date="";
+        String studnum=null, line="", sol="", quest="",require="", start="", answer="", date="";
         char firstChar ='a';
         double mark = 0;
         int numS = 0;
-        int studIndex=-1;
         List<Solution> solutionList = new ArrayList<>();
         List<Line> lineList = new ArrayList<>();
         boolean questionSection = false;
         try {
-            //File qFile = new File("tests" + File.separator + "solutionsPractise.txt");
-            File qFile = new File(fName);
+            File qFile = new File("tests" + File.separator + "solutionsPractise.txt");
+    		
             BufferedReader reader=new BufferedReader(new FileReader(qFile));
             while((line=reader.readLine())!=null){
-                if(studNum==null){
-                    studIndex = line.indexOf("#");
-                    if(studIndex>0){
-                        studNum = line.substring(0,studIndex);
-                        studName = line.substring(studIndex+1);
-                    }else{
-                        studNum = line;
-                    }
+                if(studnum==null){
+                    studnum = line;
                     continue;
                 }
                 if(line.equals("") || numS==0){//blank line separating solutions
@@ -168,7 +158,6 @@ public class Automarker {
             System.err.print("error reading file: " + e.toString());
         }
         //Debug(solutionList);
-        student = new Student(studNum,studName);
         solutions = solutionList.toArray(new Solution[1]);
     }
     
