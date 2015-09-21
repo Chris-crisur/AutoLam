@@ -13,10 +13,11 @@ import java.util.*;
  */
 public class SummaryReport extends Report{
     private double totalMark;
-    private ArrayList<Question> questions;
+    private ArrayList<Solution> solutions;
 
-    public SummaryReport(Date dateCreated) {
+    public SummaryReport(Date dateCreated, ArrayList<Solution> solutions) {
         super(dateCreated);
+        this.solutions = solutions;
     }
 
     public double getTotalMark() {
@@ -27,12 +28,30 @@ public class SummaryReport extends Report{
         this.totalMark = totalMark;
     }
 
-    public ArrayList<Question> getQuestion() {
-        return questions;
+    public ArrayList<Solution> getSolutions() {
+        return solutions;
     }
 
-    public void setQuestion(ArrayList<Question> questions) {
-        this.questions = questions;
+    public void setSolutions(ArrayList<Solution> solutions) {
+        this.solutions = solutions;
+    }
+
+    public ArrayList<String> displayReport(){
+        ArrayList<String> report = new ArrayList<String>();
+        int count = 1;
+        double totalMark = 0;
+        
+        report.add("Question #:\tMark:");
+        for (Solution sol : solutions) {
+            report.add("Question " + count + ": \t" + sol.getMark());
+            totalMark += sol.getMark();
+            
+            count++;
+        }
+        
+        report.add("\nTotal mark: \t " + totalMark);
+        
+        return report;
     }
     
     
