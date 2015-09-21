@@ -1,0 +1,179 @@
+﻿CRRCHR004
+S1
+Dnull
+Q1
+#SP1:3
+Real answer for (λx.λy.x y)(λx.x y)
+Separated symbols by whitespace (allows for longer symbol names)
+There are many ways to convert the bound variables in the equation
+above. It is a mistake to rename the free occurrence of y. Another
+mistake would be to change the meaning of the expression by
+omitting or rearranging parentheses. All conversions have to be
+done to get full marks. A mark is allocated for the right name as well.
+only square brackets, not what applied to
+<3
+!
+>(λx.λy.x y)(λx.x y)
+A:
+α -> (λx.λv.x v)(λx.x y)	[v/y]
+β -> λv.(λx.x y) v	[(λx.x y)/u]
+β -> λv.v y	[v/x]
+
+S2
+Dnull
+Q2
+#SP2:0
+Real answer for (λx.λy.xy)(λx.xy)
+Symbols not separated by whitespace
+Calculator won't detect
+<3
+!
+>(λx.λy.xy)(λx.xy)
+A:
+α -> (λx.λv.xv)(λx.xy)	[v/y]
+β -> λv.(λx.xy)v	[(λx.xy)/u]
+β -> λv.vy	[v/x]
+
+S3
+Dnull
+Q3
+#SP3:0
+Real answer for (λxy.xy)(λx.xy)
+Single char symbol. lambda expressions combined.
+Calculator won't detect
+<3
+!
+>(λxy.xy)(λx.xy)
+A:
+α -> (λxv.xv)(λx.xy)	[v/y]
+β -> λv.(λx.xy) v	[(λx.xy)/u]
+β -> λv.vy	[v/x]
+
+S4
+Dnull
+Q4
+#SP4:1
+Wrong answer for (λx.λy.x y)(λx.x y)
+free occurance of y renamed
+last beta wrong
+<3
+!
+>(λx.λy.x y)(λx.x y)
+A:
+α -> (λx.λy.x y)(λx.x v)	[v/y]
+β -> λy.(λx.x v) y	[(λx.x v)/u]
+β -> λy.v y	[v/x]
+
+S5
+Dnull
+Q5
+#SP5:3
+Real answer for (λ x.λ y.xy) (λ x.xy)
+gap between lambda and bound variable
+<3
+!
+>(λ x.λ y.x y) (λ x.x y)
+A:
+α -> (λ x.λ v.x v) (λ x.x y)	[v/y]
+β -> λ v.(λ x.x y)v	[(λ x.x y)/u]
+β -> λ v.v y	[v/x]
+
+S6
+Dnull
+Q6
+#SP6:4
+Right answer for (λx.x x)(λx.λy.x y)
+There are many ways to convert the bound variables in the equation
+above. All conversions have to be done to get full marks. An additional
+mark is allocated for the right name as well. If you combine steps you
+still get the marks (e.g., do the beta reduction without the first alpha
+conversion) provided they don’t amount to wrong guesses!
+<4
+!
+>(λx.x x)(λx.λy.x y)
+A:
+α -> ((λz.(z z))(λx.(λy.(x y))))	[z/x]
+β -> ((λx.(λy.(x y))) (λx.(λy.(x y))))	[(λx.(λy.(x y))/z]
+α -> ((λx.(λv.(x v))) (λx.(λy.(x y))))	[v/y]
+β -> (λv.((λx.(λy.(x y))) v))	[(λx.(λy.(x y)))/u]
+β -> (λv.(λy.(v y)))	[v/x]
+→ -> λv.λy.v y
+
+S7
+Dnull
+Q7
+#SP7:2
+Right answer for (λx.x x)(λx.x x)
+at least 1 beta reduction attempted
+<2
+!
+>(λx.x x)(λx.x x)
+A:
+β -> (λx.x x)(λx.x x)	[(λx.x x)/x]
+→ -> divergent
+
+S72
+Dnull
+Q7
+#SP7-2:2
+Right answer for (λx.x x)(λx.x x)
+at least 1 beta reduction attempted
+<2
+!
+>(λx.x x)(λx.x x)
+A:
+β -> (λx.x x)(λx.x x)	[(λx.x x)/x]
+β -> (λx.x x)(λx.x x)	[(λx.x x)/x]
+→ -> divergent
+
+S8
+Dnull
+Q8
+#SP8:2
+Right answer for (λ b.b)((λ a.a)(λ b.a b))
+applicative
+<2
+!Applicative
+>(λ b.b)((λ a.a)(λ b.a b))
+A:
+β -> (λ b.b)(λ b.a b)	[(λ b.b)(λ b.a b)/a]
+β -> (λ b.a b)	[(λ b.a b)/b]
+
+S9
+Dnull
+Q9
+#SP9:2
+Right answer for (λ b.b)((λ a.a)(λ b.a b))
+normal
+<2
+!Normal
+>(λ b.b)((λ a.a)(λ b.a b))
+A:
+β -> (λ a.a)(λ b.a b)	[(λ a.a)(λ b.a b)/b]
+β -> (λ b.a b)	[(λ b.a b)/a]
+
+S10
+Dnull
+Q10
+#SP10:2
+Right answer for (λ b.b)((λ a.a)(λ b.a b))
+non described method, but normal
+<2
+!
+>(λ b.b)((λ a.a)(λ b.a b))
+A:
+β -> (λ a.a)(λ b.a b)	[(λ a.a)(λ b.a b)/b]
+β -> (λ b.a b)	[(λ b.a b)/a]
+
+S11
+Dnull
+Q11
+#SP11:2
+Right answer for (λ b.b)((λ a.a)(λ b.a b))
+non described method, but applicative
+<2
+!
+>(λ b.b)((λ a.a)(λ b.a b))
+A:
+β -> (λ b.b)(λ b.a b)	[(λ b.b)(λ b.a b)/a]
+β -> (λ b.a b)	[(λ b.a b)/b]

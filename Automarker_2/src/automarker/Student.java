@@ -5,8 +5,6 @@
  */
 package automarker;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
@@ -16,38 +14,24 @@ import javafx.beans.property.SimpleStringProperty;
 public class Student extends Person{
 
     private SimpleStringProperty studentNum;
-    private double mark;
-    private SummaryReport report;
+    private int mark;
     
     public Student(String studentNum, String name) {
         super(name,"Student");
         this.studentNum = new SimpleStringProperty(studentNum);
         mark = 0;
-        report=null;
     }
 
     public String getStudentNum() {
         return studentNum.get();
     }
+    public void setMark(int i){mark+=i;}
     
-    public double getMark()
+    public int getMark()
     {
         return mark;
     }
     
-    public void setSolutions(Solution [] solutions){
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-	String date = sdf.format(new Date()); 
-        report = new SummaryReport(new Date(),solutions);
-    }
- 
-    public SummaryReport getSummaryReport(){
-        return report;
-    }
     
-    @Override
-    public String toString(){
-        return studentNum + ": " + getName() + "\n" + getSummaryReport();
-    }
     
 }

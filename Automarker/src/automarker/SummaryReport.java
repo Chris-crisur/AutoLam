@@ -12,29 +12,21 @@ import java.util.*;
  * @author Annie
  */
 public class SummaryReport extends Report{
+    private Solution [] solutions;
     private double totalMark;
-    private ArrayList<Solution> solutions;
 
-    public SummaryReport(Date dateCreated, ArrayList<Solution> solutions) {
+    public SummaryReport(Date dateCreated, Solution [] solutions) {
         super(dateCreated);
         this.solutions = solutions;
+        for(Solution sol: solutions){
+            totalMark += sol.getMark();
+        }
     }
-
-    public double getTotalMark() {
-        return totalMark;
-    }
-
+    
     public void setTotalMark(double totalMark) {
         this.totalMark = totalMark;
     }
 
-    public ArrayList<Solution> getSolutions() {
-        return solutions;
-    }
-
-    public void setSolutions(ArrayList<Solution> solutions) {
-        this.solutions = solutions;
-    }
 
     public ArrayList<String> displayReport(){
         ArrayList<String> report = new ArrayList<String>();

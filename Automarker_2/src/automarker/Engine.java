@@ -12,14 +12,14 @@ import javax.swing.JTextArea;
 //Classes Referenced Gui, Expr, ExprWrapper
 class Engine {
 
-    //private Gui gui;
+    private Gui gui;
     private ArrayList<Expr> expressions;
 
     //private Runner runner = null;
-    /*Engine(Gui gui) {
+    Engine(Gui gui) {
         this.gui = gui;
     }
-    */
+    
     Engine() {
     }
     

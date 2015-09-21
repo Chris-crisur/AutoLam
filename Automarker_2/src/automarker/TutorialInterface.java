@@ -43,6 +43,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
+import javax.swing.*;
 
 //import automarker.StudentTutorial.LinePanel.MyInputListener;
 
@@ -58,6 +59,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
     
     private JScrollPane welcomeScrollPane;   
     private JPanel mainPanel;
+    private JTabbedPane tabbedPane = new JTabbedPane();
     private JScrollPane mainPane;
     private JTextArea welcomeArea;
     private QuestionPanel [] qPanel;
@@ -92,7 +94,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            System.out.println("Error Occured while reading file");
+            java.util.logging.Logger.getLogger(StudentTutorial.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
         
@@ -249,7 +251,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         
         //place all solutions in a StringBuilder (useing outputFormat method of Solution)
         //save StringBuilder variable to file
-        StringBuilder solutionBuilder = new StringBuilder(((Student)student).getStudentNum()+"#"+((Student)student).getName());
+        StringBuilder solutionBuilder = new StringBuilder(((Student)student).getStudentNum());
         solutionBuilder.append("\n");
         for(int i=0;i<questions.length;i++){
                 solutions[i] = qPanel[i].getSolution();
@@ -285,7 +287,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         }else if(action.equals("PREVIOUS")){
             previousQuestion();
         }else if(action.equals("UPLOAD")){
-            boolean chris = false; //TODO: take out later
+            boolean chris = true; //TODO: take out later
             if (!chris){
                 int i = chooser.showOpenDialog(this);
                 if(i== chooser.APPROVE_OPTION){
@@ -299,7 +301,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
                     }
                 }
             }else{
-                boolean result = loadQuestions("questions.txt");
+                boolean result = loadQuestions("questionsTutorial.txt");
                     if(result){
                         mainPanel.remove(upload);   //next replaces upload button
                         mainPanel.add(next,BorderLayout.EAST);
