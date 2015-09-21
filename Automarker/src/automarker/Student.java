@@ -30,10 +30,9 @@ public class Student extends Person{
         return studentNum.get();
     }
     
-    public double getMark()
-    {
+    public double getMark(){
         if(mark==0)
-            report.getTotalMark();
+            mark=report.getTotalMark();
         return mark;
     }
     
@@ -49,7 +48,7 @@ public class Student extends Person{
     
     @Override
     public String toString(){
-        return studentNum + ": " + getName() + "\n" + getSummaryReport().getReport();
+        return studentNum + ": " + getName() + "\n" + report.getReport();
     }
     
 }

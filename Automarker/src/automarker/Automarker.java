@@ -34,12 +34,11 @@ public class Automarker {
     public Automarker(String stdSolution){
         
         student = null;
-        loadFile(stdSolution);
-        
-        markSolutions();
+        //loadFile(stdSolution);
+        //markSolutions();
         
         //check tests
-       // performTests("all");
+        performTests("all");
         
         if (student!=null){
             student.setSolutions(solutions);
@@ -47,7 +46,6 @@ public class Automarker {
         }else{
             System.err.println("error with student creation");
         }
-        
     }
     
     public Student result() /**CHANGE*/
@@ -55,10 +53,11 @@ public class Automarker {
         return student;
     }
     
-    //testing method
+    //method used for test cases
     private void performTests(String tests){
         Debug("TESTING");
         solutions = TestCases.loadTest(tests);
+        markSolutions();
         boolean check=false;
         String q_description = "";
         for(Solution sol: solutions){
@@ -69,26 +68,30 @@ public class Automarker {
         }
     }
     
+    /***
+     * loadFile reads in a student's file which contains their solutions and places these solutions in the
+     * "solutions" array
+     * 
+     * @param fName filename
+     */
+     
     private void loadFile(String fName){
-        
-        boolean sLoaded = false;
-        //read solutions from txt file
-        //select a file to be read
-        String studNum=null, studName=null,line="", sol="", quest="",require="", start="", answer="", date="";
+        String studNum=null, studName=null,line="", sol="", quest="",require="", start="", answer="", date=""; //Strings for solution
+        int studIndex=-1, expressionIndex = 0, expressionEndIndex = 0, reasoningIndex = 0; //a few indices
+        String reasoning = "",expression = ""; 
         char firstChar ='a';
         double mark = 0;
-        int numS = 0;
-        int studIndex=-1;
+        int numS = 0;   //number of solutions
         List<Solution> solutionList = new ArrayList<>();
         List<Line> lineList = new ArrayList<>();
         boolean questionSection = false;
+        
         try {
-            //File qFile = new File("tests" + File.separator + "solutionsPractise.txt");
             File qFile = new File(fName);
             BufferedReader reader=new BufferedReader(new FileReader(qFile));
             while((line=reader.readLine())!=null){
-                if(studNum==null){
-                    studIndex = line.indexOf("#");
+                if(studNum==null){                                              //first line is student number and name
+                    studIndex = line.indexOf("#");                              //# separates student number and student name
                     if(studIndex>0){
                         studNum = line.substring(0,studIndex);
                         studName = line.substring(studIndex+1);
@@ -97,7 +100,7 @@ public class Automarker {
                     }
                     continue;
                 }
-                if(line.equals("") || numS==0){//blank line separating solutions
+                if(line.equals("") || numS==0){                                 //blank line separating solutions
                     //Debug("NEW");
                     if(questionSection){
                         quest+="\n";
@@ -116,7 +119,7 @@ public class Automarker {
             	firstChar = line.charAt(0);
                 //Question starts with '#', mark starts with '>', requirement starts with '!'
                 
-                if (!questionSection){ //read in solution specific info
+                if (!questionSection){                                          //read in solution specific info
                     if (firstChar =='S'){
                         sol = line;
                     }else if(firstChar=='D'){
@@ -126,11 +129,11 @@ public class Automarker {
                     }
                     else{
                         //Debug("line");
-                        int expressionIndex = line.indexOf("->") + 3; //3 for "-> "
-                        int expressionEndIndex = line.indexOf("\t["); //include "[" in case student used tab in answer
-                        int reasoningIndex = expressionEndIndex + 2;
-                        String reasoning = "";
-                        String expression = "";
+                        expressionIndex = line.indexOf("->") + 3;           //3 for "-> "
+                        expressionEndIndex = line.indexOf("\t[");           //include "[" in case student used tab in answer
+                        reasoningIndex = expressionEndIndex + 2;
+                        reasoning = "";
+                        expression = "";
                         if(expressionEndIndex<0){
                             expression = line.substring(expressionIndex);
                         }else{
@@ -141,10 +144,8 @@ public class Automarker {
                         //Debug(linetemp);
                         lineList.add(linetemp);
                     }
-                    
                 }else{ //read in question info
                     if (firstChar=='#'){
-
                         quest = line.substring(1);
                     }else if(firstChar=='<'){
                         mark = Double.parseDouble(line.substring(1));
@@ -161,10 +162,9 @@ public class Automarker {
             }
             reader.close();
             solutionList.add(new Solution(new Question(quest,mark,require,start),lineList.toArray(new Line[1])));
-            sLoaded = true; //questions loaded succesfully
+            //questions loaded succesfully
  
         } catch (IOException e) {
-        	//welcomeArea.setText("Error occured while loading the file:"+e.toString());
             System.err.print("error reading file: " + e.toString());
         }
         //Debug(solutionList);
@@ -172,11 +172,42 @@ public class Automarker {
         solutions = solutionList.toArray(new Solution[1]);
     }
     
+    //method for quick System.out.println() for objects only when debugging
     private void Debug(Object o){
         if(debug)
             System.out.println(o);
     }
     
+    /***
+     * Method which processes solutions array to assign marks to each line of the solutions
+     * 
+     * For each solution, assess if the reduction is correct
+     * There are some common operations done regardless of reduction type
+     * Then reduction-specific processing is done
+     * If the reduction is correct, a mark is awarded
+     * 
+     * Then assess if the reasoning (between the "[ ]") is correct
+     * Some common operations are performed
+     * Then reduction-specific reasoning processing is performed
+     * If the reasoning is correct, a mark is awarded.
+     * Partial marks are possible where alpha reduction reasoning is wrongly 
+     * generalised or where multiple alpha; so reasoning partially correct
+     * could also happen when only one alpha conversion was done, but two
+     * were required, then there may have been correct conversion of the one,
+     * but overall wrong
+     * 
+     * Multiple alpha reductions can be performed in one step
+     * A premature alpha reduction can be performed and marked correctly
+     * An unnecessary alpha reduction is not marked, but not penalised by default
+     * 
+     * A false beta ('B') or eta ('n') reduction occurs a mark penalty - where the final mark is divided by the mark penalty (1 is start)
+     * Multiple errors increases the mark penalty (increasing size of division)
+     * 
+     * Conversion ('>') is not awarded marks, but not marked incorrect if wrong
+     * 
+     * Arithmetic reduction ('=')
+     * 
+     */
     public void markSolutions(){
         Stream stream = new Stream();
         
@@ -184,8 +215,9 @@ public class Automarker {
         Options.getEvaluationOrderOption().setValue(2); //default evaluation is normal (without thunks)
         
         for (Solution sol: solutions){
+            
+            //common reduction steps
             String qStart = sol.getQuestion().getStart();
-            String qStartChanged = qStart;      //used for alpha conversion changes
             String require = sol.getQuestion().getRequirements();
             if(require.equalsIgnoreCase("Applicative")){
                 Options.getEvaluationOrderOption().setValue(0); //set evaulation to applicative
@@ -195,13 +227,6 @@ public class Automarker {
                 Debug("Normal");
             }
             Line [] lines = sol.getLines();
-            try {
-                 Expr expr = Parser.parse(qStart);
-                 Debug("parsed");
-                 Debug(qStart);
-                } catch (Parser.ParseException var9_9) {
-                    System.out.println(var9_9.getMessage());
-            }
             
             Line prev = new Line(qStart,'s',"");
             List<Expr> originalResult = stream.runExpr(qStart); //reductions from question
@@ -211,14 +236,17 @@ public class Automarker {
             Expr tempResult;
             
             finalResultsList = new ArrayList<>();
-            //due diligence process for accuracy of caculator
+            //due diligence process for accuracy of calculator
+            //what can happen is the final answer can change depending on alpha 
+            //conversion of calculator in terms of symbols in final result (semantically
+            //the same)
             for(Expr expr:originalResult){
                 tempResults = stream.runExpr(expr.toString());
                 tempResult = tempResults.get(tempResults.size()-1);
                 finalResults.add(tempResult);
                 finalResultsList.add(tempResult.toString());
                 if(!previousResult.toString().equals(tempResult.toString())){
-                    System.out.println(sol.getID()+"\tPOSSIBLE ERROR IN CALCULATOR<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                    System.out.println(sol.getID()+"\tPOSSIBLE ERROR IN CALCULATOR<<<<<<<<<<<<<");
                     //System.exit(0);
                 }
                 previousResult = tempResult;
@@ -291,7 +319,7 @@ public class Automarker {
                 //prevLastExpr == currLastExpr;     //false
                 //prevLastExpr.toString().equals(currLastExpr.toString()); //true
                 
-                //new String[] {"β", "α", "η", "→" }
+                //reduction specific processing for reduction marks
                 switch(curr.getReduction()){
                     case 'a':
                     case 'α':
@@ -312,34 +340,31 @@ public class Automarker {
                                 //calculator changes ambiguous symbols automatically, so if there is still ambiguity, wrong
                                 break;
                             }
-                            int indexI = -1;
                             int iOffset=0;  //if there are multiple 'i's, indices can shift between comparison lines
                             int alphaNum = -1;
                             boolean bound=false;
                             int numIs = 0;
-                            int numIsCurrent = 0;
                             int numIsTrack = 0;
                             
                             for(int i = 0;i<prevAlphaStr.length();i++){
                                 char c = prevAlphaStr.charAt(i);
                                 if(c=='i'){ 
                                     if(prevAlphaStr.charAt(i-1)=='\\' || prevAlphaStr.charAt(i-1)=='λ'){    //check affected a lambda symbol
-                                        indexI = i;                                                         //get index of alpha-converted character
                                         alphaNum = Character.getNumericValue(prevAlphaStr.charAt(i+1));
-                                        Debug("alphaNum: i" + alphaNum);
-                                        Debug("i: " + i);
-                                        Debug("iOffset: " + iOffset);
                                         numIs = countI(prevAlphaStr.substring(0,i));
-                                        char c2 = currAlphaStr.charAt(i-numIs);                           //retrieve character of line at same index
-                                        Debug("c2: " + c2);
-                                        Debug("numIs: " + numIs);
-                                        Debug("charAt(" + (i-numIs) + ")");
+                                        char c2 = currAlphaStr.charAt(i-numIs);                             //retrieve character of line at same index
+                                        Debug("alphaNum: i" + alphaNum +
+                                                "i: " + i +
+                                                "iOffset: " + iOffset + 
+                                                "c2: " + c2 + 
+                                                "numIs: " + numIs + 
+                                                "charAt(" + (i-numIs) + ")");
                                         if(c != c2){                                                        //if character changed, good!
                                             numIsTrack = countI(prevAlphaStr.substring(0,i-numIs)) - countI(trackAlphaChange.substring(0,i-numIs));
-                                            Debug("numIsTrack: " + numIsTrack);
                                             trackAlphaChange = trackAlphaChange.substring(0,i-numIsTrack) + c2 + trackAlphaChange.substring(i-numIsTrack+2);
-                                            Debug("prevAlphaStr: " + prevAlphaStr);
-                                            Debug("trackAlphaChange: " + trackAlphaChange);
+                                            Debug(" numIsTrack: " + numIsTrack + 
+                                                    "\n prevAlphaStr: " + prevAlphaStr +
+                                                    "\n trackAlphaChange: " + trackAlphaChange);
                                             if(c2 != prev.getExpression().charAt(i-iOffset)){               //check lambda bound symbol changed                                                
                                                 int boundVarI = prevAlphaStr.indexOf("i"+alphaNum,i+1);     //find corresponding bound var
                                                 if(boundVarI<0){
@@ -355,28 +380,25 @@ public class Automarker {
                                                             Debug("lambda encountered");
                                                             break;
                                                         }
-                                                        Debug("iOffset: " + iOffset);
+                                                        
                                                         numIs = countI(prevAlphaStr.substring(0,boundVarI));
-                                                        Debug("numIs: " + numIs);
-                                                        //numIsCurrent = countI(currAlphaStr.substring(i-numIs,boundVarI-numIs-iOffset-1));
-                                                        //Debug("numIsCurrent: " + numIsCurrent);
-                                                        Debug("charAt(" + (boundVarI-numIs) + ")");
-                                                        
                                                         char c3 = currAlphaStr.charAt(boundVarI-numIs);
-                                                        
-                                                        Debug("c3: " + c3);
+                                                        Debug(" iOffset: " + iOffset + 
+                                                                "\n numIs: " + numIs + 
+                                                                "\n charAt(" + (boundVarI-numIs) + ")" + 
+                                                                "\n c3: " + c3);
                                                         if(c3==c2){                                             //bound var also changed
                                                             Debug("bound var changed");
                                                             bound = true;
                                                             numIsTrack = countI(prevAlphaStr.substring(0,boundVarI)) - countI(trackAlphaChange.substring(0,boundVarI-numIs));
-                                                            Debug(prevAlphaStr.substring(0,boundVarI));
-                                                            Debug(trackAlphaChange.substring(0,boundVarI-numIs));
-                                                            Debug(countI(prevAlphaStr.substring(0,boundVarI-numIs)) + " - " +  countI(trackAlphaChange.substring(0,boundVarI-numIs)));
-                                                            Debug("numIsTrack: " + numIsTrack);
-                                                            Debug("prevAlphaStr: " + prevAlphaStr);
-                                                            Debug(trackAlphaChange.substring(0,boundVarI-numIsTrack) + "\t[" + c2 + "]\t"+trackAlphaChange.substring(boundVarI-numIsTrack+2));
                                                             trackAlphaChange = trackAlphaChange.substring(0,boundVarI-numIsTrack) + c2 + trackAlphaChange.substring(boundVarI-numIsTrack+2);
-                                                            Debug("trackAlphaChange: " + trackAlphaChange);
+                                                            Debug(prevAlphaStr.substring(0,boundVarI) + 
+                                                                    "\n " + trackAlphaChange.substring(0,boundVarI-numIs) + 
+                                                                    "\n " + countI(prevAlphaStr.substring(0,boundVarI-numIs)) + " - " +  countI(trackAlphaChange.substring(0,boundVarI-numIs)) + 
+                                                                    "\n numIsTrack: " + numIsTrack + 
+                                                                    "\n prevAlphaStr: " + prevAlphaStr + 
+                                                                    "\n " + trackAlphaChange.substring(0,boundVarI-numIsTrack) + "\t[" + c2 + "]\t"+trackAlphaChange.substring(boundVarI-numIsTrack+2) + 
+                                                                    "\n trackAlphaChange: " + trackAlphaChange);
                                                         }else{
                                                             Debug("bound var not changed");
                                                             bound = false;                                      //bound var not changed
@@ -396,7 +418,7 @@ public class Automarker {
                                         iOffset+=1;
                                     } 
                                 }
-                            }
+                            }//end for loop
                             if(!trackAlphaChange.equals(currAlphaStr)){
                                 //premature alpha reduction possible
                                 //check total number of alpha conversions in all steps. If reduced, good
@@ -414,12 +436,12 @@ public class Automarker {
                                 for(Expr expr: currResult){
                                     numAlphasCurrResult += countAlpha(expr.toString());
                                 }
-                                Debug("prevResult: " + prevResult);
-                                Debug("prevResultTrack: " + prevResultTrack);
-                                Debug("currResult: " + currResult);
-                                Debug("numAlphasPrevResult: " + numAlphasPrevResult);
-                                Debug("numAlphasTrack: " + numAlphasTrack);
-                                Debug("numAlphasCurrResult: " + numAlphasCurrResult);
+                                Debug("prevResult: " + prevResult + 
+                                        "\n prevResultTrack: " + prevResultTrack + 
+                                        "\n currResult: " + currResult + 
+                                        "\n numAlphasPrevResult: " + numAlphasPrevResult + 
+                                        "\n numAlphasTrack: " + numAlphasTrack + 
+                                        "\n numAlphasCurrResult: " + numAlphasCurrResult);
 
                                 if(numAlphasCurrResult<numAlphasTrack && numAlphasTrack<numAlphasPrevResult){
                                     //the user alphas were required at some point anyway, mark awarded
@@ -440,10 +462,10 @@ public class Automarker {
                             for(Expr expr: currResult){
                                 numAlphasCurrResult += countAlpha(expr.toString());
                             }
-                            Debug("prevResult: " + prevResult);
-                            Debug("currResult: " + currResult);
-                            Debug("numAlphasPrevResult: " + numAlphasPrevResult);
-                            Debug("numAlphasCurrResult: " + numAlphasCurrResult);
+                            Debug("prevResult: " + prevResult + 
+                                        "\n currResult: " + currResult + 
+                                        "\n numAlphasPrevResult: " + numAlphasPrevResult + 
+                                        "\n numAlphasCurrResult: " + numAlphasCurrResult);
                             
                             if(numAlphasCurrResult<numAlphasPrevResult){
                                 Debug("award mark");
@@ -459,13 +481,16 @@ public class Automarker {
                     case 'b':
                     case 'B':
                     case 'β':
+                        /*** BETA REDUCTIONS ***/
                         Debug("BETA");
                         markAwarded = doBetaReduction(prevLastExpr, currLastExpr, prevReducedExpr, currReducedExpr, curr);
                         if(markAwarded){
                             Debug("markAwarded, prevAlphaStr before: " + prevAlphaStr);
                             prevAlphaStr = prevReducedExpr.toString();
                             Debug("markAwarded, prevAlphaStr after: " + prevAlphaStr);
-                        }else{ //may be alpha's still required in future
+                        }
+                        else{ 
+                            //may be alpha's still required in future
                             prevAlphaStr = prevReducedExpr.toString();
                             prevAlphaExpr = prevReducedExpr;    //prevReducedExpr will change below, keep Alpha state(s)
                             currAlphaStr = currAlphaExpr.toString();
@@ -482,7 +507,6 @@ public class Automarker {
                                    aIndex[i] = prevReducedExpr.toString().indexOf("i"+i);
                                    aIndexLast[i] = prevLastExpr.toString().indexOf("i"+i);
                                    Debug(aIndex[i]);
-                                   //\v.\i0.(\x.x y z) v
                                    try {
                                         prevReducedExpr = Parser.parse(
                                                 prevReducedExpr.toString().replace(
@@ -497,14 +521,13 @@ public class Automarker {
                                                     ));
                                         }
                                     } catch (Parser.ParseException pe) {
-                                        System.out.println(pe.getMessage());
+                                        System.err.println(pe.getMessage());
                                         break;
-                                        //jTextArea.setText(pe.getMessage());
                                     }
                                    
                                }
-                               Debug("prevReducedExpr: " + prevReducedExpr + "\ncurrReducedExpr: " + currReducedExpr);
-                               Debug("prevLastExpr: " + prevLastExpr + "\ncurrLastExpr" + currLastExpr); 
+                               Debug(" prevReducedExpr: " + prevReducedExpr + "\ncurrReducedExpr: " + currReducedExpr + 
+                                        "\n prevLastExpr: " + prevLastExpr + "\ncurrLastExpr" + currLastExpr); 
                                
                                markAwarded = doBetaReduction(prevLastExpr, currLastExpr, prevReducedExpr, currReducedExpr, curr);
                                
@@ -534,6 +557,7 @@ public class Automarker {
                         break;    
                     case 'n':
                     case 'η':
+                        /*** ETA REDUCTIONS ***/
                         Debug("ETA");
                         Options.getEtaReductionsOption().setValue(true);
                         Debug(Options.getEtaReductionsOption().getValue());
@@ -559,6 +583,7 @@ public class Automarker {
                     case '>':
                     case '→':
                     case '=':
+                        /*** CONVERSION or ARITHMETIC ***/
                         Debug("CONVERSION");
                         Debug("prevReducedExpr: " + prevReducedExpr);
                         Debug("currReducedExpr: " + currReducedExpr);
@@ -584,13 +609,13 @@ public class Automarker {
                         else{
                             markAwarded = true;
                         }
-                        
                         break;
                     default:
                         break;
                 }
                 
-                /*** reasoning ***/
+                /*** REASONING ***/
+                //common processing for reasoning
                 Debug("-------REASONING-------");
                 //check change of symbols correct
                 String reasoning = curr.getReasoning();
@@ -610,7 +635,6 @@ public class Automarker {
                     } catch (Parser.ParseException pe) {
                         System.out.println(pe.getMessage());
                         break;
-                        //jTextArea.setText(pe.getMessage());
                     }
                     String currStr = currReducedExpr.toString();
                     Debug("prevStr: " + prevStr);
@@ -618,12 +642,14 @@ public class Automarker {
                     String newStr = "";
                     Debug("target: " + target);
                     Debug("replacement: " + replacement);
+                    
+                    //reduction specific processing for reasoning marks
                     switch(curr.getReduction()){
                         case 'a':
                         case 'α':
                         case '>':
                         case '→':
-                        case '=':
+                        case '=':   
                             if(curr.getReduction()=='a'||curr.getReduction()=='α')
                                 Debug("ALPHA");
                             else
@@ -649,20 +675,17 @@ public class Automarker {
                             //changing these to a unique number helps with application
                             //of reasoning marking
                             int countUniqueAlphas = countAlpha(prevStr);
-                            
                             String compareStr = currStr;
-                            
                             Debug("countUniqueAlphas+1: " + (countUniqueAlphas+1) + " targets.length: " + targets.length);
                             Debug("currStr: " + currStr);
-                            
                             for(int i=0;i<alphaChanges.length;i++){
                                 //for each unique iX
                                 compareStr = compareStr.replace(replacements[i],targets[i]);
                                 Debug("replacements[i]: " + replacements[i] + " targets[i]: " + targets[i]);
-                                
                             }
                             
                             //count # in prev.getExpression and compareStr
+                            //compareStr is currStr with each replacement replaced by it's corresponding target
                             int countTargetBefore = 0;
                             int countTargetAfter = 0;
                             int targetIndex = 0;
@@ -696,6 +719,8 @@ public class Automarker {
                                 Debug("countTargetBefore: " + countTargetBefore);
                                 Debug("countTargetAfter: " + countTargetAfter);
                                 if(countTargetBefore==countTargetAfter){
+                                    //if currStr correctly converted back to prev.getExpression() (from compareStr to prevExprStr)
+                                    //using replace method then number of targets will be the same
                                     replacementCorrect[i] = true;
                                     Debug("replacementCorrect: " + replacementCorrect[i]);
                                     Debug("award half mark for reasoning (correctly replaced)");
@@ -715,9 +740,10 @@ public class Automarker {
                             } catch (Parser.ParseException pe) {
                                 System.out.println(pe.getMessage());
                             }
-                            //parsing automatically does alpha conversion where necessary
                             
                             //parsing automatically does alpha conversion where necessary
+                            //thus compareStr will be the same after parsing as prevStr
+                            //if alpha converted correctly
                             Debug("compareStr: " + compareStr);
                             
                             if(compareStr.equals(prevStr)){
@@ -729,22 +755,18 @@ public class Automarker {
                                     curr.addMark(alphaChanges.length/2.0);
                                     Debug("EQUALS correct");
                                 }
-                                else
+                                else{
                                     curr.addMark(alphaChanges.length/2.0);
-                                
-                                /*for (int i=0;i<alphaChanges.length;i++){
-                                    if(replacementCorrect[i] == true)
-                                        curr.addMark(1);
-                                }*/
+                                }
                             }else if(curr.getReduction()=='>'||curr.getReduction()=='→'){
-                                    //could be converting, in which case should equal currStr
+                                    //could be converting, in which case should equal currStr not prevStr
                                     if(compareStr.equals(currStr)){
                                         Debug("CONVERSION correct");//no marks for conversion
                                     }
                             }
                             
                             if(curr.getMark()==1&&curr.getReduction()=='='){
-                                //mark not awarded for reasoning, but still correct line, have an extra check just for '=' (arithmatic)
+                                //mark not awarded for reasoning, but still correct line, have an extra check just for '=' (arithmetic)
                                 int tarInd = prevStr.indexOf(target);
                                 compareStr = prevStr.substring(0,tarInd) + replacement + prevStr.substring(tarInd+target.length());
                                 Debug("last chance for compareStr: " + compareStr);
@@ -897,7 +919,7 @@ public class Automarker {
             sol.setMark(markPenalty);
             
             Debug("------------------------------\n" + sol);
-            Debug("Mark penalty: " + markPenalty + "\n\n---------------------------------------------------------------------------");
+            Debug("Mark penalty: " + (markPenalty-1) + "\n\n---------------------------------------------------------------------------");
         }
     }
     
@@ -974,5 +996,5 @@ public class Automarker {
             System.err.print("ReadError: " + ex.toString());
             } 
     }
-    
+        
 }
