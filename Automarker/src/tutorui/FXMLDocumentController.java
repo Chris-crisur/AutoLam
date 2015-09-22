@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -18,15 +17,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import automarker.Automarker;
 import automarker.Student;
-import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 /**
@@ -35,7 +31,7 @@ import javafx.scene.control.TableView;
  */
 public class FXMLDocumentController implements Initializable {
     
-    List <File> selectedFiles = null;
+    File selectedFile = null;
     FileReader fr = null;
     Automarker marker;
     Student student;
@@ -63,19 +59,21 @@ public class FXMLDocumentController implements Initializable {
         }
         else
         {
-            if ( (selectedFiles!= null))
+            if ( (selectedFile!= null) && (selectedFile.getPath().endsWith(edtUpload.getText().trim())))
             {
-                for (File selected : selectedFiles){
-                marker = new Automarker(selected.getPath());
-                student = marker.result();
-                if(student != null)
-                {
-                    updateTable(student);
-                } else {lblError.setText("error on file");}
-                
-                }
+                marker = new Automarker(selectedFile.getPath());
             }
-            
+            else
+            {
+                selectedFile = null;
+               marker =  new Automarker(edtUpload.getText());
+            }
+            student = marker.result();
+            if(student != null)
+            {
+                updateTable(student);
+            } else {lblError.setText("error on file");}
+            selectedFile = null;
             edtUpload.clear();
 
         }
@@ -85,15 +83,14 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void uploadAction(ActionEvent event)
     {
-       lblError.setText("");
+        lblError.setText("");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose File");
         fileChooser.getExtensionFilters().addAll( new ExtensionFilter("Lambda files", "*.lam"));
-            selectedFiles = fileChooser.showOpenMultipleDialog(anchor.getScene().getWindow());
-        if (selectedFiles != null)
+            selectedFile = fileChooser.showOpenDialog(anchor.getScene().getWindow());
+        if (selectedFile != null)
         {
-            for (File selected : selectedFiles){
-            edtUpload.setText(selected.getName());}
+            edtUpload.setText(selectedFile.getName());
         }
     }
     

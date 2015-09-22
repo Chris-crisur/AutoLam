@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -43,6 +44,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
+import javax.swing.*;
 
 //import automarker.StudentTutorial.LinePanel.MyInputListener;
 
@@ -52,7 +54,7 @@ import javax.swing.text.DocumentFilter;
  */
 public class TutorialInterface extends JFrame implements ActionListener{
     private final String [] REDUCTIONS = {"alpha","beta","eta","conversion"};
-    private Person student;
+    private Student student;
 
     //component declarations
     
@@ -60,7 +62,6 @@ public class TutorialInterface extends JFrame implements ActionListener{
     private JPanel mainPanel;
     private JScrollPane mainPane;
     private JTextArea welcomeArea;
-    private QuestionPanel [] qPanel;
     private JScrollPane [] qPane;
     
     private JButton submit;
@@ -70,20 +71,21 @@ public class TutorialInterface extends JFrame implements ActionListener{
     private int qIndex;
     
     
-    private Solution [] solutions;
+    public Solution [] solutions;
     private Question [] questions;
     private javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
+    List<Question> questionList;
     
-    public static void main(String [] args){
+   /** public static void main(String [] args){
         TutorialInterface TI = new TutorialInterface();
-    }
+    }*/
     
-    public TutorialInterface(){
+    public TutorialInterface(Student stud){
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+         
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -92,18 +94,17 @@ public class TutorialInterface extends JFrame implements ActionListener{
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            System.out.println("Error Occured while reading file");
         }
-        //</editor-fold>
+        //</editor-fold>*/
         
-        signIn();
+        //signIn();
         
-        setLayout(new BorderLayout());
-
+        //setLayout(new BorderLayout());
+        this.student = stud;
         String welcome = loadWelcomeMessage();
         qIndex = -1;
-        initComponents();
-        setVisible(true);
+        //initComponents();
+        //setVisible(true);
     }
     
     @SuppressWarnings("unchecked")
@@ -174,7 +175,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         return "WELCOME!";
     }
     
-    private boolean loadQuestions(String txtFile){
+    public List<Question> loadQuestions(String txtFile){
         boolean qLoaded = false;
         //read questions from txt file
         //select a file to be read
@@ -182,7 +183,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
         char firstChar ='a';
         double mark = 0;
         int numQ = 0;
-        List<Question> questionList = new ArrayList<>();
+         questionList = new ArrayList<Question>();
         try {
             File qFile = new File(txtFile);
     		
@@ -219,48 +220,21 @@ public class TutorialInterface extends JFrame implements ActionListener{
         }
         System.out.println(questionList);
         questions = questionList.toArray(new Question[numQ]);
-        //questions = new Question[10];
-        /*questions[0] = new Question("Question 1",10.0,"R");
-        questions[1] = new Question("Question 2", 20.0,"Associative");
-        for (int i = 2;i<10;i++){
-            questions[i] = new Question("Question",((int)(Math.random()*10+1)),"None");
-        }
-        int numQ = questions.length;
-        */
-        
-        //load questions into QuestionPanel and that into JScrollPane
-        qPanel = new QuestionPanel[numQ];
-        qPane = new JScrollPane[numQ];
-        
-        for (int i=0;i<numQ;i++){
-            qPanel[i] = new QuestionPanel(questions[i]);
-            qPane[i] = new JScrollPane(qPanel[i]);
-            //qPane[i].setPreferredSize(new Dimension(500, 400));
-            //mainPanel.add(qPane[i]);
-        }
-        
         solutions = new Solution[numQ];
-        
-       
-        return qLoaded; 
+        return questionList; 
     }
-    
-    private void saveSolutions(){
-        
-        //place all solutions in a StringBuilder (useing outputFormat method of Solution)
-        //save StringBuilder variable to file
-        StringBuilder solutionBuilder = new StringBuilder(((Student)student).getStudentNum()+"#"+((Student)student).getName());
-        solutionBuilder.append("\n");
-        for(int i=0;i<questions.length;i++){
-                solutions[i] = qPanel[i].getSolution();
-                
+    String date = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+    public void saveSolutions(){
+        StringBuilder solutionBuilder = new StringBuilder(student.getStudentNum()+"#"+ student.getName());
+        solutionBuilder.append("\n"+date);
+        for(int i=0;i<solutions.length;i++){
                 solutionBuilder.append(solutions[i].outputFormat());
                 solutionBuilder.append("\n");
         }  
         System.out.println(solutionBuilder.toString());
         Writer writer;
         try{	
-            writer = new BufferedWriter(new FileWriter(new File("solutions.txt"), false));	//new writer
+            writer = new BufferedWriter(new FileWriter(new File("solutions.lam"), false));	//new writer
             writer.write(solutionBuilder.toString());//write string
             writer.close();
             JOptionPane.showMessageDialog(this, "Find the output textfile in you current working directory.");
@@ -285,11 +259,11 @@ public class TutorialInterface extends JFrame implements ActionListener{
         }else if(action.equals("PREVIOUS")){
             previousQuestion();
         }else if(action.equals("UPLOAD")){
-            boolean chris = false; //TODO: take out later
+            boolean chris = true; //TODO: take out later
             if (!chris){
                 int i = chooser.showOpenDialog(this);
                 if(i== chooser.APPROVE_OPTION){
-                    boolean result = loadQuestions(chooser.getSelectedFile().getPath());
+                    boolean result = false;//loadQuestions(chooser.getSelectedFile().getPath());
                     if(result){
                         mainPanel.remove(upload);   //next replaces upload button
                         mainPanel.add(next,BorderLayout.EAST);
@@ -299,7 +273,7 @@ public class TutorialInterface extends JFrame implements ActionListener{
                     }
                 }
             }else{
-                boolean result = loadQuestions("questions.txt");
+                boolean result = false;//loadQuestions("questionsTutorial.txt");
                     if(result){
                         mainPanel.remove(upload);   //next replaces upload button
                         mainPanel.add(next,BorderLayout.EAST);
@@ -322,7 +296,6 @@ public class TutorialInterface extends JFrame implements ActionListener{
         if (qIndex >= questions.length){
             next.setEnabled(false);
             mainPanel.add(submit, BorderLayout.CENTER);
-            //qIndex-=1;
         }else{
             mainPanel.add(qPane[qIndex], BorderLayout.CENTER);
             prev.setEnabled(true);
@@ -349,129 +322,5 @@ public class TutorialInterface extends JFrame implements ActionListener{
         mainPanel.repaint();
     }
     
-    class LinePanel extends JPanel{
-        private final String [] REDUCTIONS = {"alpha","beta","eta","conversion"};
-        private JComboBox reductionBox;
-        private JTextField expressionField;
-        private JTextField reasonField;
-        private JLabel errorLabel;
-        
-        public LinePanel(){
-            super(new BorderLayout());
-            reductionBox = new JComboBox();
-            reductionBox.setModel(new DefaultComboBoxModel(new String[] {"β", "α", "η", "→" }));
-            expressionField = new JTextField(50);
-            expressionField.addActionListener(new MyInputListener());
-            reasonField = new JTextField(30);
-            reasonField.addActionListener(new MyInputListener());
-            errorLabel = new JLabel(" ");
-            errorLabel.setForeground(Color.red);
-            ((AbstractDocument) expressionField.getDocument()).setDocumentFilter(new Formatter.LambdaFilter());
-            ((AbstractDocument) reasonField.getDocument()).setDocumentFilter(new Formatter.LambdaFilter());
-
-            add(reductionBox, BorderLayout.WEST);
-            add(expressionField, BorderLayout.CENTER);
-            add(reasonField, BorderLayout.EAST);
-            add(errorLabel,BorderLayout.SOUTH);
-        }
-
-        public Line getLine(){
-            String str = (String)reductionBox.getSelectedItem();
-            char reductionChar = str.charAt(0);
-            Line line = new Line(expressionField.getText(),reductionChar,reasonField.getText());
-            return line;
-        }
-        private class MyInputListener implements java.awt.event.ActionListener { 
-        	
-            public void actionPerformed(ActionEvent paramActionEvent) { 
-                //System.err.println("Action caught!");
-                String str2 = expressionField.getText();
-                String currText = "";
-                
-                try{
-                    //System.err.println("About to parse...");
-                    Parser.parse(str2);
-                    errorLabel.setText(" ");
-                    currText=" ";
-                }catch (Parser.ParseException exception)
-                {
-                    //System.err.println("Exception caught!");
-                    errorLabel.setText("\t\tExpression error: " + exception.getMessage());
-                }
-                
-                str2 = reasonField.getText();
-                currText = errorLabel.getText();
-                try{
-                    //System.err.println("About to parse...");
-                    Parser.parse(str2);
-                    errorLabel.setText(currText);
-                }catch (Parser.ParseException exception)
-                {
-                    //System.err.println("Exception caught!");
-                    errorLabel.setText(currText+" \t|\t Reason error: " + exception.getMessage());
-                }
-            }
-        }
-    }
-        
-        
-    class QuestionPanel extends JPanel{
-        private JScrollPane questionScroll;
-        private JTextArea questionArea;
-        private JTextField startField;
-        private LinePanel lineP;
-        private JButton addLine;
-        private Question question;
-        
-        public QuestionPanel(Question q){
-            super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-            question = q;
-            questionArea = new JTextArea();
-            questionArea.setColumns(20);
-            questionScroll = new JScrollPane();
-            questionArea.setText("Question " + q.getId() + ": " + q.getDescription() + "\nRequirements: " + q.getRequirements() + "\nMarks: " + q.getMaxMark());
-            questionArea.setEditable(false);
-            startField = new JTextField(q.getStart());
-            startField.setEditable(false);
-            lineP = new LinePanel();
-            addLine = new JButton();
-            addLine.setText("Add line");
-            questionScroll.setViewportView(questionArea);
-            
-            add(questionScroll);
-            add(startField);
-            add(addLine);
-            add(lineP);
-            
-            addLine.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    add(new LinePanel());
-                }
-            });
-        }
-        
-        public Solution getSolution(){
-            int numComp = getComponentCount();
-            Component [] comps = getComponents();
-            int numLines = 0;
-            List<LinePanel> linePanels = new ArrayList<>();
-            for (int i=0;i<numComp;i++){
-                if (comps[i] instanceof LinePanel){
-                    linePanels.add((LinePanel)comps[i]);
-                }
-            }
-            
-            numLines = linePanels.size();
-            
-            Line [] lines = new Line [numLines];
-            for (int i=0;i<numLines;i++){
-                lines[i] = linePanels.get(i).getLine();
-            }
-            
-            Solution sol = new Solution(question, lines);
-            return sol;
-        }
-        
-    }
     
 }

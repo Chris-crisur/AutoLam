@@ -6,31 +6,40 @@
 <?import javafx.collections.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="studentui.StudentUIController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="608.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="studentui.StudentUIController">
   <children>
-    <SplitPane fx:id="splitter" dividerPositions="0.11779448621553884" focusTraversable="true" layoutX="0.0" layoutY="2.0" orientation="VERTICAL" prefHeight="401.0" prefWidth="623.0">
-      <items>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="67.0" prefWidth="623.0">
-          <children>
-            <Text layoutX="24.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lambda Calculus Parser" textAlignment="CENTER">
-              <font>
-                <Font size="30.0" />
-              </font>
-            </Text>
-            <Hyperlink fx:id="hStart" layoutX="526.0" layoutY="17.0" onAction="#SetTabs" text="Start" />
-          </children>
-        </AnchorPane>
-        <AnchorPane fx:id="anchor" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-          <children>
-            <TabPane fx:id="tabPane" layoutX="0.0" layoutY="0.0" prefHeight="372.0" prefWidth="621.0" tabClosingPolicy="UNAVAILABLE" />
-          </children>
-        </AnchorPane>
-      </items>
-    </SplitPane>
+    <VBox id="btnSubmit" layoutX="1.0" layoutY="-10.0" prefHeight="-1.0" prefWidth="608.0">
+      <children>
+        <SplitPane fx:id="splitter" dividerPositions="0.36074270557029176" focusTraversable="true" orientation="VERTICAL" prefHeight="379.0" prefWidth="404.0">
+          <items>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="67.0" prefWidth="623.0">
+              <children>
+                <Text layoutX="24.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lambda Calculus Parser" textAlignment="CENTER">
+                  <font>
+                    <Font size="30.0" />
+                  </font>
+                </Text>
+                <Hyperlink fx:id="hStart" layoutX="526.0" layoutY="17.0" onAction="#SetTabs" text="Start" />
+              </children>
+            </AnchorPane>
+            <AnchorPane fx:id="anchor" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+              <children>
+                <TabPane fx:id="tabPane" layoutX="0.0" layoutY="0.0" prefHeight="372.0" prefWidth="621.0" tabClosingPolicy="UNAVAILABLE" />
+              </children>
+            </AnchorPane>
+          </items>
+        </SplitPane>
+        <Button fx:id="btnSubmit" mnemonicParsing="false" onAction="#submit" text="Submit" visible="false" />
+      </children>
+    </VBox>
   </children>
+  <effect>
+    <SepiaTone />
+  </effect>
   <stylesheets>
     <URL value="@studentui.css" />
   </stylesheets>

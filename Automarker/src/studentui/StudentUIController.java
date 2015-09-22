@@ -5,6 +5,7 @@
  */
 package studentui;
 
+import automarker.Question;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -35,6 +36,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import automarker.TutorialInterface;
+import automarker.Line;
+import automarker.Solution;
+import java.util.List;
+import java.util.Optional;
+import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
 
 /**
  * FXML Controller class
@@ -51,12 +59,14 @@ public class StudentUIController implements Initializable {
     @FXML
     Button btnUpload;
     @FXML
+    Button btnSubmit;
+    @FXML
     TextField edtName;
     @FXML
     TextField edtStdNo;
     @FXML
     Hyperlink hStart;
-    
+    static List<Question> questions;
     @FXML
     TabPane tabPane;
     VBox Vcontainer;
@@ -64,9 +74,10 @@ public class StudentUIController implements Initializable {
     AnchorPane anchor;
     @FXML
     SplitPane splitter;
-    
+    TutorialInterface ti;
     File selectedFile;
     Student student ;
+    Solution[] solutions;
     
    @FXML
    Label lblPath;
@@ -88,12 +99,13 @@ public class StudentUIController implements Initializable {
     @FXML
     private void SetTabs(ActionEvent event){
            tabPane = new TabPane(); tabPane.prefHeight(372);tabPane.prefWidth(621);
-                for (int i=0; i<4; i++)
+                for (Question question: questions)
                 {
-                    tabPane.getTabs().add(new QueTab(i));
+                    tabPane.getTabs().add(new QueTab(question));
                 }
                 anchor.getChildren().add(tabPane); //splitter.getItems().add(anchor);
                 hStart.setVisible(false);
+                btnSubmit.setVisible(true);
     }
     
     @FXML
@@ -101,16 +113,10 @@ public class StudentUIController implements Initializable {
         if (selectedFile!= null && !"".equals(edtStdNo.getText()) && !"".equals(edtName.getText())) 
         {
             student = new Student(edtStdNo.getText(), edtName.getText());
-            Stage stage = (Stage)login.getScene().getWindow();
-            try {
-                Parent root = FXMLLoader.load(getClass().getResource("StudentUI.fxml"));
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.show();
-            } catch (IOException ex) {
-                lblPath.setText("Error switching: "+ ex);
-            }
+            ti = new TutorialInterface(student);
+             questions = ti.loadQuestions(selectedFile.getPath());
             
+            setup("StudentUI.fxml");
             
         }
         else
@@ -120,14 +126,8 @@ public class StudentUIController implements Initializable {
             
 
         }
-
-    @FXML
-    private void addLine()
-    {
-        
-       Vcontainer.getChildren().add(new vbExpr());
-       System.out.println(Vcontainer.getChildren().size());
-    }
+ 
+   
     private class vbExpr extends VBox{
         HBox hbox ;
         
@@ -139,6 +139,7 @@ public class StudentUIController implements Initializable {
 
         private vbExpr() {
             this.cbExpr = new ComboBox(expr);
+            cbExpr.setValue(expr.get(0));
             cbExpr.setPrefSize(71, 24);
             this.edtExpr = new TextField();
             hbox = new HBox();
@@ -152,8 +153,13 @@ public class StudentUIController implements Initializable {
             hbox.getChildren().addAll(cbExpr,edtExpr,edtReason);
             this.getChildren().addAll(hbox,lblError);
             //this.getChildren().add(lblError);
-            
        }
+       public Line getLine(){
+            String str = (String)cbExpr.getValue();
+            char reductionChar = str.charAt(0);
+            Line line = new Line(edtExpr.getText(),reductionChar,edtReason.getText());
+            return line;
+        }
         
     }
     
@@ -161,46 +167,102 @@ public class StudentUIController implements Initializable {
         
         SplitPane split = new SplitPane();
         Pane pane;
+        Question question;
+        VBox mycontainer;
+        Line[] answers;
         //orientation="VERTICAL" prefHeight="291.0" prefWidth="634.0"
     
  
-        QueTab(int i){
-            super("Question" +i );
+        QueTab(Question question){
+            super("Question " +question.getId() );
+            System.out.println("Question: "+question.getId());
+            this.question= question;
             split.prefHeight(634);
-            split.prefWidth(291);
+            split.prefWidth(391);
             split.setOrientation(Orientation.VERTICAL);
             ScrollPane scroll = new ScrollPane();
-            Vcontainer = new VBox();
-            scroll.setContent(Vcontainer);
+            mycontainer = new VBox();
+            mycontainer.getChildren().add(new vbExpr());
+            scroll.setContent(mycontainer);
             split.getItems().addAll(init(),scroll);
-            //split.getItems().add(scroll);
             this.setContent(split);
-            //this.setContent(split);
-            System.out.println(scroll.getChildrenUnmodifiable().contains(Vcontainer));
-            
         }
+        
             private Pane init(){
             pane = new Pane();
             pane.prefHeight(291); pane.prefWidth(600);
             pane.setLayoutX(-1);pane.setLayoutY(-6);
             
+            
             TextArea edtInfo = new TextArea();
+            edtInfo.setText("Description: "+question.getDescription()+"\nRequirements: "+"\n" + question.getMaxMark()+" mark(s)");
             edtInfo.setLayoutX(12); edtInfo.setLayoutY(18);
-            edtInfo.setPrefHeight(44); edtInfo.setPrefWidth(576); edtInfo.setWrapText(true);
+            edtInfo.setPrefHeight(100); edtInfo.setPrefWidth(576); edtInfo.setWrapText(true);
             Button btnAdd = new Button("Add Line");
             btnAdd.setOnAction(new EventHandler<ActionEvent>(){
 
                 @Override
                 public void handle(ActionEvent event) {
-                    addLine(); //To change body of generated methods, choose Tools | Templates.
+                    mycontainer.getChildren().add(new vbExpr()); //To change body of generated methods, choose Tools | Templates.
                 }
             });
             btnAdd.setLayoutX(242); btnAdd.setLayoutY(64);
-            Label lblExpr = new Label("EXpr"); lblExpr.setLayoutX(23); lblExpr.setLayoutY(66);
+            Label lblExpr = new Label(question.getStart()); lblExpr.setLayoutX(23); lblExpr.setLayoutY(66);
             pane.getChildren().addAll(edtInfo,lblExpr,btnAdd);
             return pane;
         }
+        public Line[] Answer()
+        {
+            int j= mycontainer.getChildren().size();
+            answers = new Line[j];
+            for (int i=0; i<j;i++)
+            {
+                 answers[i]= ((vbExpr)(mycontainer.getChildren().get(i))).getLine();
+            }
+            return answers;
+        }
        
+    }
+    
+    private void setup(String fxml){
+    Stage stage = (Stage)login.getScene().getWindow();
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource(fxml));
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.show();
+            } catch (IOException ex) {
+                lblPath.setText("Error switching: "+ ex);
+            }}
+    
+    private Boolean confirm()
+    {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Submission");
+        alert.setHeaderText("Are you sure you want to submit?");
+        alert.setContentText("Make sure you have checked your work before you submit.\nClick OK to Submit");
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+        return true;}else{return false;}
+    }
+    
+    @FXML
+    private void submit(ActionEvent event){
+        if (confirm()){
+        int size = tabPane.getTabs().size();
+        solutions = new Solution[size];
+        for(int j =0; j<size;j++)
+        {
+            QueTab q = (QueTab)(tabPane.getTabs().get(j));
+            solutions[j] = new Solution(q.question,q.Answer());
+        }
+        
+        ti.solutions = solutions;
+        ti.saveSolutions();
+        setup("Login.fxml");
+        
+        }
     }
     
     @Override
