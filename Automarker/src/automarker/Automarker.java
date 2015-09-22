@@ -76,7 +76,7 @@ public class Automarker {
      */
      
     private void loadFile(String fName){
-        String studNum=null, studName=null,line="", sol="", quest="",require="", start="", answer="", date=""; //Strings for solution
+        String line="", sol="", quest="",require="", start="", answer="", date=""; //Strings for solution
         int studIndex=-1, expressionIndex = 0, expressionEndIndex = 0, reasoningIndex = 0; //a few indices
         String reasoning = "",expression = ""; 
         char firstChar ='a';
@@ -90,16 +90,11 @@ public class Automarker {
             File qFile = new File(fName);
             BufferedReader reader=new BufferedReader(new FileReader(qFile));
             while((line=reader.readLine())!=null){
-                if(studNum==null){                                              //first line is student number and name
-                    studIndex = line.indexOf("#");                              //# separates student number and student name
-                    if(studIndex>0){
-                        studNum = line.substring(0,studIndex);
-                        studName = line.substring(studIndex+1);
-                    }else{
-                        studNum = line;
-                    }
-                    continue;
-                }
+                  if (student ==null){                                           //first line is student number and name
+                    String[] id = line.split("#");                              //# separates student number and student name
+                    student = new Student(id[0],id[1]);
+                    continue;}
+                
                 if(line.equals("") || numS==0){                                 //blank line separating solutions
                     //Debug("NEW");
                     if(questionSection){
@@ -168,7 +163,7 @@ public class Automarker {
             System.err.print("error reading file: " + e.toString());
         }
         //Debug(solutionList);
-        student = new Student(studNum,studName);
+        //student = new Student(studNum,studName);
         solutions = solutionList.toArray(new Solution[1]);
     }
     
