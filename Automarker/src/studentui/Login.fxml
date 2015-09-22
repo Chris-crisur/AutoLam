@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="studentui.StudentUIController">
+  <children>
+    <Pane layoutX="14.0" layoutY="7.0" prefHeight="367.0" prefWidth="572.0">
+      <children>
+        <Text layoutX="160.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to AutoLam">
+          <font>
+            <Font size="30.0" />
+          </font>
+        </Text>
+        <TextField fx:id = "edtStdNo" layoutX="52.0" layoutY="96.0" prefWidth="200.0" />
+        <TextField fx:id = "edtName" layoutX="52.0" layoutY="143.0" prefWidth="200.0" />
+        <Label layoutX="52.0" layoutY="80.0" text="Student Number" />
+        <Label layoutX="52.0" layoutY="127.0" text="Name" />
+        <Button fx:id = "btnUpload" layoutX="52.0" layoutY="215.0" mnemonicParsing="false" text="Select File" onAction="#uploadAction" />
+        <Label fx:id = "lblPath" layoutX="52.0" layoutY="194.0" text="" textFill="#ff3333" />
+        <Text fill="#396600" layoutX="100.0" layoutY="58.0" strokeType="OUTSIDE" strokeWidth="0.0" text="λ">
+          <font>
+            <Font size="50.0" />
+          </font>
+        </Text>
+        <TextArea layoutX="332.0" layoutY="143.0" prefHeight="104.0" prefWidth="190.0" text="Please entire your Name and Student number&#10;below. And upload the text file &#10;containing a lambda &#10;calculus set of questions." wrapText="true" />
+        <Button fx:id = "login" layoutX="466.0" layoutY="297.0" mnemonicParsing="false" text="Proceed &gt;&gt;" onAction="#loginAction" />
+      </children>
+    </Pane>
+  </children>
+  <effect>
+    <SepiaTone />
+  </effect>
+</AnchorPane>
