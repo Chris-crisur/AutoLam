@@ -10,11 +10,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="608.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="studentui.StudentUIController">
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="808.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="studentui.StudentUIController">
   <children>
     <VBox id="btnSubmit" layoutX="1.0" layoutY="-10.0" prefHeight="-1.0" prefWidth="608.0">
       <children>
-        <SplitPane fx:id="splitter" dividerPositions="0.36074270557029176" focusTraversable="true" orientation="VERTICAL" prefHeight="379.0" prefWidth="404.0">
+        <SplitPane fx:id="splitter" dividerPositions="0.36074270557029176" focusTraversable="true" orientation="VERTICAL" prefHeight="579.0" prefWidth="804.0">
           <items>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="67.0" prefWidth="623.0">
               <children>
@@ -28,7 +28,7 @@
             </AnchorPane>
             <AnchorPane fx:id="anchor" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
               <children>
-                <TabPane fx:id="tabPane" layoutX="0.0" layoutY="0.0" prefHeight="372.0" prefWidth="621.0" tabClosingPolicy="UNAVAILABLE" />
+                <TabPane fx:id="tabPane" layoutX="0.0" layoutY="0.0" prefHeight="472.0" prefWidth="621.0" tabClosingPolicy="UNAVAILABLE" />
               </children>
             </AnchorPane>
           </items>
@@ -37,7 +37,7 @@
       </children>
     </VBox>
   </children>
-  
+ 
   <stylesheets>
     <URL value="@studentui.css" />
   </stylesheets>

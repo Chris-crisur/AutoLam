@@ -101,7 +101,7 @@ public class StudentUIController implements Initializable {
     }
     @FXML
     private void SetTabs(ActionEvent event){
-           tabPane = new TabPane(); tabPane.prefHeight(372);tabPane.prefWidth(621);
+           tabPane = new TabPane(); //tabPane.prefHeight(372);tabPane.prefWidth(621);
                 for (Question question: questions)
                 {
                     tabPane.getTabs().add(new QueTab(question));
@@ -158,7 +158,9 @@ public class StudentUIController implements Initializable {
             edtExpr.setOnAction(new EventHandler<ActionEvent>(){
 
                 @Override
-                public void handle(ActionEvent event) { String str = edtExpr.getText();
+                public void handle(ActionEvent event) { 
+                    lblError.setText("");
+                    String str = edtExpr.getText();
                     try {
                         Parser.parse(str);
                     } catch (Parser.ParseException ex) {
@@ -191,27 +193,29 @@ public class StudentUIController implements Initializable {
             super("Question " +question.getId() );
             System.out.println("Question: "+question.getId());
             this.question= question;
-            split.prefHeight(634);
-            split.prefWidth(391);
+            //split.prefHeight(634);
+            //split.prefWidth(391);
             split.setOrientation(Orientation.VERTICAL);
             ScrollPane scroll = new ScrollPane();
             mycontainer = new VBox();
             mycontainer.getChildren().add(new vbExpr());
             scroll.setContent(mycontainer);
+            scroll.prefHeight(390); scroll.prefWidth(700);
             split.getItems().addAll(init(),scroll);
             this.setContent(split);
         }
         
             private Pane init(){
             pane = new VBox();
-            pane.prefHeight(291); pane.prefWidth(600);
-            pane.setLayoutX(-1);pane.setLayoutY(-6);
+            pane.prefHeight(391); pane.prefWidth(800);
+            //pane.setLayoutX(-1);pane.setLayoutY(-6);
             
             
             TextArea edtInfo = new TextArea();
             edtInfo.setText("Description: "+question.getDescription()+"\nRequirements: "+"\n" + question.getMaxMark()+" mark(s)");
             edtInfo.setLayoutX(12); edtInfo.setLayoutY(18);
-            edtInfo.setPrefHeight(100); edtInfo.setPrefWidth(576); edtInfo.setWrapText(true);
+            //edtInfo.setPrefHeight(100); edtInfo.setPrefWidth(576); 
+            edtInfo.setWrapText(true);
             Button btnAdd = new Button("Add Line");
             btnAdd.setOnAction(new EventHandler<ActionEvent>(){
 
