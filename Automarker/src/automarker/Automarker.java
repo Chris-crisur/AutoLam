@@ -33,15 +33,15 @@ public class Automarker {
     private BufferedWriter writer;
     
     public Automarker(String stdSolution){
-        debug = true;
+        debug = false;
         stream = new Stream();
         student = null;
 
-        Solution [] solutions = null;//loadFile(stdSolution);
-        //solutions = markSolutions(solutions);
+        Solution [] solutions = loadFile(stdSolution);
+        solutions = markSolutions(solutions);
         
         //check tests
-        performTests("t2");
+        //performTests("all");
         if (student!=null){
             student.setSolutions(solutions);
             createReport();
@@ -998,7 +998,8 @@ public class Automarker {
                         case 'η':
                             Debug("ETA");
                             Debug("award mark for reasoning");
-                            curr.addMark(1);
+                            if(curr.getMark()==1)   //eta reduction correctly done already, award for reasoning
+                                curr.addMark(1);
                             break;
                         //case '>':
                         //case '→':

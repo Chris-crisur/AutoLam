@@ -15,7 +15,7 @@ public class SummaryReport extends Report{
     private Solution [] solutions;
     private double totalMark;
 
-    public SummaryReport(Date dateCreated, Solution [] solutions) {
+    public SummaryReport(String dateCreated, Solution [] solutions) {
         super(dateCreated);
         this.solutions = solutions;
         for(Solution sol: solutions){

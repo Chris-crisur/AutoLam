@@ -8,32 +8,34 @@ package automarker;
 
 import java.util.*;
 /**
- *
+ *  Class has potential to collectively analyse data from students.
+ *  In this implementation, it can store
  * @author Annie
  */
 public class AnalyticsReport extends Report{
-    private double avgMark;
-    private ArrayList<String> mistakes;
     
-    public AnalyticsReport(Date dateCreated) {
+    private double marks;
+    private ArrayList<String> studNumbers;
+    
+    public AnalyticsReport(String dateCreated) {
         super(dateCreated);
+        studNumbers = new ArrayList<>();
     }
 
     public double getAvgMark() {
-        return avgMark;
+        return marks/studNumbers.size();
     }
 
-    public void setAvgMark(double avgMark) {
-        this.avgMark = avgMark;
+    public void addStudent(String studNumber, double mark) {
+        this.marks += mark;
+        studNumbers.add(studNumber);
     }
 
-    public ArrayList<String> getMistakes() {
-        return mistakes;
+    public ArrayList<String> getStudentNumbers() {
+        return studNumbers;
     }
 
-    public void setMistakes(ArrayList<String> mistakes) {
-        this.mistakes = mistakes;
-    }
+    
     
     
 }
