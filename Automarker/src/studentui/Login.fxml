@@ -28,12 +28,10 @@
             <Font size="50.0" />
           </font>
         </Text>
-        <TextArea layoutX="332.0" layoutY="143.0" prefHeight="104.0" prefWidth="190.0" text="Please entire your Name and Student number&#10;below. And upload the text file &#10;containing a lambda &#10;calculus set of questions." wrapText="true" />
+        <TextArea layoutX="302.0" layoutY="83.0" prefHeight="200.0" prefWidth="200.0" text="INSTRUCTIONS&#10;Please entire your Name and Student number&#10;below. And upload the text file &#10;containing a lambda &#10;calculus set of questions." wrapText="true" />
         <Button fx:id = "login" layoutX="466.0" layoutY="297.0" mnemonicParsing="false" text="Proceed &gt;&gt;" onAction="#loginAction" />
       </children>
     </Pane>
   </children>
-  <effect>
-    <SepiaTone />
-  </effect>
+  
 </AnchorPane>

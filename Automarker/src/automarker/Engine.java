@@ -1,8 +1,5 @@
 package automarker;
 
-/*
- * Decompiled with CFR 0_101.
- */
 import automarker.Context;
 import java.util.ArrayList;
 import java.util.HashSet;

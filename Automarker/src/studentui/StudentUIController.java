@@ -124,7 +124,7 @@ public class StudentUIController implements Initializable {
         }
         else
         {
-           lblPath.setText("Follow the instructs");
+           lblPath.setText("Follow the instructions");
         }
             
 

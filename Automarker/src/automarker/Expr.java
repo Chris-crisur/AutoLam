@@ -355,8 +355,3 @@ abstract class Expr {
     }
 }
 
-
-/* Location:              C:\Users\Chris\Google Drive\University\2015 - 3rd Year UCT\CSC\3003S\Capstone\Lambda\examples\lambda.jar!\lambda\Expr.class
- * Java compiler version: 2 (46.0)
- * JD-Core Version:       0.7.1
- */

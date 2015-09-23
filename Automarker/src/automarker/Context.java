@@ -148,8 +148,3 @@ class Context implements javax.swing.ListModel {
     }
 }
 
-
-/* Location:              C:\Users\Chris\Google Drive\University\2015 - 3rd Year UCT\CSC\3003S\Capstone\Lambda\examples\lambda.jar!\lambda\Context.class
- * Java compiler version: 2 (46.0)
- * JD-Core Version:       0.7.1
- */
