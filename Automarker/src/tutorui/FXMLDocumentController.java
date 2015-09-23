@@ -24,6 +24,7 @@ import automarker.Automarker;
 import automarker.Student;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
@@ -34,7 +35,7 @@ import javafx.scene.control.TableView;
  */
 public class FXMLDocumentController implements Initializable {
     
-    File selectedFile = null;
+    List <File> selectedFiles = null;
     FileReader fr = null;
     Automarker marker;
     Student student;
@@ -63,21 +64,18 @@ public class FXMLDocumentController implements Initializable {
         }
         else
         {
-            if ( (selectedFile!= null) && (selectedFile.getPath().endsWith(edtUpload.getText().trim())))
+            if (selectedFiles!= null) 
             {
-                marker = new Automarker(selectedFile.getPath());
-            }
-            else
-            {
-                selectedFile = null;
-               marker =  new Automarker(edtUpload.getText());
-            }
-            student = marker.result();
-            if(student != null)
-            {
-                updateTable(student);
-            } else {lblError.setText("error on file");}
-            selectedFile = null;
+                for (File selected : selectedFiles){
+                marker = new Automarker(selected.getPath());
+                student = marker.result();
+                if(student != null)
+                {
+                    updateTable(student);
+                } else {lblError.setText("error on file");}
+                
+                }
+            } 
             edtUpload.clear();
 
         }
@@ -91,11 +89,9 @@ public class FXMLDocumentController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose File");
         fileChooser.getExtensionFilters().addAll( new ExtensionFilter("Lambda files", "*.lam"));
-            selectedFile = fileChooser.showOpenDialog(anchor.getScene().getWindow());
-        if (selectedFile != null)
-        {
-            edtUpload.setText(selectedFile.getName());
-        }
+            selectedFiles = fileChooser.showOpenMultipleDialog(anchor.getScene().getWindow());
+        for (File selected : selectedFiles){
+            edtUpload.setText(selected.getName());}
     }
     
     private void updateTable(Student stud)

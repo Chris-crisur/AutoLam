@@ -65,17 +65,7 @@
           </children>
         </VBox>
       </left>
-      <right>
-        <ScrollPane prefHeight="200.0" prefWidth="200.0">
-          <content>
-            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="324.0" prefWidth="200.0">
-              <children>
-                <TextArea id="taReport" layoutX="0.0" layoutY="0.0" prefHeight="324.0" prefWidth="200.0" promptText="Select a student on the table to view their report" wrapText="true" />
-              </children>
-            </AnchorPane>
-          </content>
-        </ScrollPane>
-      </right>
+     
       <top>
         <Text fill="#66a3ff" strokeType="OUTSIDE" strokeWidth="0.0" text="Tutor View" textAlignment="CENTER">
           <font>
