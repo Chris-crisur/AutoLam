@@ -39,7 +39,7 @@ public class Student extends Person{
     public void setSolutions(Solution [] solutions){
         SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
 	String date = sdf.format(new Date()); 
-        report = new SummaryReport(new Date(),solutions);
+        report = new SummaryReport(date,solutions);
     }
  
     public SummaryReport getSummaryReport(){

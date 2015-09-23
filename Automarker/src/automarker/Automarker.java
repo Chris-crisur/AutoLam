@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,21 +26,22 @@ import java.util.Map;
  * 
  */
 public class Automarker {
-    private boolean debug = true;
-    private Solution [] solutions;
+    private final boolean debug;
+    private final Stream stream;
     private List<String> finalResultsList;
     private Student student;
     private BufferedWriter writer;
     
     public Automarker(String stdSolution){
-        
+        debug = false;
+        stream = new Stream();
         student = null;
-        //loadFile(stdSolution);
-        //markSolutions();
+
+        Solution [] solutions = loadFile(stdSolution);
+        solutions = markSolutions(solutions);
         
         //check tests
-        performTests("all");
-        
+        //performTests("all");
         if (student!=null){
             student.setSolutions(solutions);
             createReport();
@@ -48,6 +50,7 @@ public class Automarker {
         }
     }
     
+    //returns the Student which has a solutions file contained within it's object
     public Student result() /**CHANGE*/
     {
         return student;
@@ -56,26 +59,39 @@ public class Automarker {
     //method used for test cases
     private void performTests(String tests){
         Debug("TESTING");
-        solutions = TestCases.loadTest(tests);
-        markSolutions();
-        boolean check=false;
-        String q_description = "";
-        for(Solution sol: solutions){
-            check = TestCases.checkAnswer(sol);
-            q_description = sol.getQuestion().getDescription();
-            Debug(q_description.substring(0,q_description.indexOf(":")) + ": " + check);
-            //System.out.println("\n"+sol.toString());
+        Solution [] solns = TestCases.loadTest(tests);
+        if(tests.equals("performance")){
+            long before = System.currentTimeMillis();
+            solns = markSolutions(solns);
+            long after = System.currentTimeMillis();
+            System.out.println("time taken: " + (after-before)/1000.0);
+        }else{
+            solns = markSolutions(solns);
+            boolean check=false;
+            String q_description = "";
+            for(Solution sol: solns){
+                check = TestCases.checkAnswer(sol);
+                q_description = sol.getQuestion().getDescription();
+                Debug(q_description.substring(0,q_description.indexOf(":")) + ": " + check);
+                //System.out.println("\n"+sol.toString());
+            }
         }
+    }
+    
+    //method for quick System.out.println() for objects only when debugging
+    private void Debug(Object o){
+        if(debug)
+            System.out.println(o);
     }
     
     /***
      * loadFile reads in a student's file which contains their solutions and places these solutions in the
-     * "solutions" array
+     * "solutions" global array
      * 
      * @param fName filename
      */
      
-    private void loadFile(String fName){
+    private Solution [] loadFile(String fName){
         String line="", sol="", quest="",require="", start="", answer="", date=""; //Strings for solution
         int studIndex=-1, expressionIndex = 0, expressionEndIndex = 0, reasoningIndex = 0; //a few indices
         String reasoning = "",expression = ""; 
@@ -90,10 +106,11 @@ public class Automarker {
             File qFile = new File(fName);
             BufferedReader reader=new BufferedReader(new FileReader(qFile));
             while((line=reader.readLine())!=null){
-                  if (student ==null){                                           //first line is student number and name
+                if (student == null){                                           //first line is student number and name
                     String[] id = line.split("#");                              //# separates student number and student name
                     student = new Student(id[0],id[1]);
-                    continue;}
+                    continue;
+                }
                 
                 if(line.equals("") || numS==0){                                 //blank line separating solutions
                     //Debug("NEW");
@@ -163,14 +180,7 @@ public class Automarker {
             System.err.print("error reading file: " + e.toString());
         }
         //Debug(solutionList);
-        //student = new Student(studNum,studName);
-        solutions = solutionList.toArray(new Solution[1]);
-    }
-    
-    //method for quick System.out.println() for objects only when debugging
-    private void Debug(Object o){
-        if(debug)
-            System.out.println(o);
+        return solutionList.toArray(new Solution[1]);
     }
     
     /***
@@ -200,13 +210,18 @@ public class Automarker {
      * 
      * Conversion ('>') is not awarded marks, but not marked incorrect if wrong
      * 
-     * Arithmetic reduction ('=')
+     * Arithmetic reduction ('=') is implemented
      * 
+     * The automarker defaults to Normal order reduction, but a student can use Applicative order if Normal order was not required in the question
+     * If Normal order or Applicative order were explicitly required, only the appropriate reductions are considered and lines marked accordingly.
+     * 
+     * 
+     * @param solutions - array with the student's answers to questions
+     * @return solutions - the array of solutions with each question and line marked
      */
-    public void markSolutions(){
-        Stream stream = new Stream();
+    private Solution [] markSolutions(Solution [] solutions){
         
-        Options.getEtaReductionsOption().setValue(false);
+        Options.getEtaReductionsOption().setValue(false);   //eta reduction is off by default
         Options.getEvaluationOrderOption().setValue(2); //default evaluation is normal (without thunks)
         
         for (Solution sol: solutions){
@@ -234,14 +249,15 @@ public class Automarker {
             //due diligence process for accuracy of calculator
             //what can happen is the final answer can change depending on alpha 
             //conversion of calculator in terms of symbols in final result (semantically
-            //the same)
+            //the same) (see test cases for "(λx.x x) (λx.λy.x y)", "((λx.λy.λz. x y)(λx.x y z) λz.z)", and "(λx.λy. y y) y")
             for(Expr expr:originalResult){
                 tempResults = stream.runExpr(expr.toString());
                 tempResult = tempResults.get(tempResults.size()-1);
                 finalResults.add(tempResult);
                 finalResultsList.add(tempResult.toString());
                 if(!previousResult.toString().equals(tempResult.toString())){
-                    System.out.println(sol.getID()+"\tPOSSIBLE ERROR IN CALCULATOR<<<<<<<<<<<<<");
+                    System.out.println(sol.getID()+"\tPOSSIBLE ERROR IN CALCULATOR");
+                    System.out.println("list of possible results from " + qStart + " : " + finalResultsList);
                     //System.exit(0);
                 }
                 previousResult = tempResult;
@@ -265,7 +281,6 @@ public class Automarker {
             int markPenalty = 1; //divisor
             int numA = -1;
             int numAExpr = -1;
-            //new String[] { "α", "β", "η", "→" }
             for (Line curr: lines){
                 markAwarded=false;
                 Debug("\nLINE: " + curr);
@@ -279,9 +294,64 @@ public class Automarker {
                     currResult = stream.runExpr(prev.getExpression()); 
                     Options.getEtaReductionsOption().setValue(false);
                     Debug("currResult: " + currResult);
-                    //if really done, break
+                    
                     if(currResult.size()==1){
-                        break;
+                        if((curr.getReduction()=='b'||curr.getReduction()=='B'||curr.getReduction()=='β')){
+                            //may be the case that there is a redex in the middle of the expression that the calculator doesn't detect correctly
+                            //detects by eleminating non-reducible symbols before said redex
+                            Debug("currResult size still == 1: " + currResult);
+                            if(prevReducedExpr==null){
+                                prevReducedExpr = originalResult.get(0);
+                                try {
+                                    currReducedExpr = Parser.parse(curr.getExpression());
+                                } catch (Parser.ParseException pe) {
+                                    System.out.println(pe.getMessage());
+                                    break;
+                                }
+                            }else{ 
+                                prevReducedExpr = currResult.get(0); 
+                            }
+                            String [] symbols = prevReducedExpr.toString().split(" ");
+                            String [] tmpArray;
+                            Debug("prevReducedExpr: " + prevReducedExpr);
+                            int prevResultsLen = stream.runExpr(prevReducedExpr.toString()).size();
+                            boolean symBeforeLam = !symbols[0].contains("\\");
+                            boolean symLamAfter = false;
+                            int index = -1;
+                            for(int i=1;i<symbols.length-1;i++){
+                                if(symbols[i].contains("\\")){
+                                    symLamAfter = true;
+                                    index=i;
+                                    break;
+                                }
+                            }
+
+                            if(symBeforeLam && symLamAfter){
+                                Debug("symBeforeLam && symLamAfter, index: " + index);
+                                StringBuilder sbPrev = new StringBuilder();
+                                StringBuilder sbCurr = new StringBuilder();
+                                String [] newSymbols = currReducedExpr.toString().split(" ");
+                                for(int i=index;i<symbols.length;i++){
+                                    sbPrev.append(symbols[i]).append(" ");
+                                }
+                                for(int i=index;i<newSymbols.length;i++){
+                                    sbCurr.append(newSymbols[i]).append(" ");
+                                }
+                                List<Expr> tempResultsPrev = stream.runExpr(sbPrev.toString());
+                                if(tempResultsPrev.size()>prevResultsLen){
+                                    List<Expr> tempResultsCurr = stream.runExpr(sbCurr.toString());
+                                    Debug("tempResultsPrev: " + tempResultsPrev);
+                                    Debug("tempResultsCurr: " + tempResultsCurr);
+                                    if(tempResultsCurr.size()>1)
+                                        markAwarded = doBetaReduction(tempResultsPrev.get(tempResultsPrev.size()-1), tempResultsCurr.get(tempResultsCurr.size()-1), tempResultsPrev.get(1),tempResultsCurr.get(1), curr);
+                                    else
+                                        markAwarded = doBetaReduction(tempResultsPrev.get(tempResultsPrev.size()-1), tempResultsCurr.get(tempResultsCurr.size()-1), tempResultsPrev.get(1),tempResultsCurr.get(0), curr);
+                                }
+                            }
+                        }else{
+                            //if really done, break
+                            break;
+                        }
                     }
                 }
                 
@@ -302,7 +372,6 @@ public class Automarker {
                 } catch (Parser.ParseException pe) {
                     System.out.println(pe.getMessage());
                     break;
-                    //jTextArea.setText(pe.getMessage());
                 }
                 currAlphaExpr = currResult.get(0);
                 currLastExpr = currResult.get(currResult.size()-1);
@@ -319,9 +388,21 @@ public class Automarker {
                     case 'a':
                     case 'α':
                         /*** ALPHA REDUCTION ***/
+                        /*
+                        check number of symbols converted by the calculator in the previous and current lines (which is done automatically for conflicts)
+                        for each character in the previous line parsed by the calculator, 
+                        if it is an 'i' and the previous char is a lambda symbol (alpha conversion can only affect lambda symbols),
+                        then check the character of the student's current line at the same relative point.
+                        If the characters are different, means an alpha reduction has started to take place correctly
+                        find bound variables (which have the same iX format as lambda symbol, and check if these were changed
+                        in the current student line too.
+                        If there was an alpha reduction performed at an earlier stage than strictly required (according to calculator),
+                        then can check the total number of alpha converted symbols in all steps, and if the reduction was actually necessary.
+                        A necessary reduction would decrease the number of symbols in the solution.
+                        */
                         Debug("ALPHA");
                         prevAlphaStr = prevAlphaExpr.toString();
-                        trackAlphaChange=prevAlphaStr;
+                        trackAlphaChange=prevAlphaStr;          //used to change symbols of prevAlphaStr according to what user performed
                         currAlphaStr = currAlphaExpr.toString();
                         Debug("previous alpha string: " + prevAlphaStr);
                         Debug("current alpha string:  " + currAlphaStr);
@@ -329,7 +410,8 @@ public class Automarker {
                         numA = countAlpha(prevAlphaStr);
                         numAExpr = countAlpha(currAlphaStr);
                         Debug("# alpha's in prev: " + (numA+1) + "\n# alpha's in curr: " + (numAExpr+1));
-                        if(numAExpr<numA){ //there are less alpha reductions performed by calculator
+                        if(numAExpr<numA){ 
+                            //there are less alpha reductions performed by calculator
                             //can award marks proportional to number of alpha reductions
                             if(numAExpr>-1){ //default is -1
                                 //calculator changes ambiguous symbols automatically, so if there is still ambiguity, wrong
@@ -477,15 +559,22 @@ public class Automarker {
                     case 'B':
                     case 'β':
                         /*** BETA REDUCTIONS ***/
+                        /*
+                        check beta reduction using doBetaReduction method
+                        may be alpha conversions still required in future but not performed yet by student,
+                        if so, change prevReducedExpr and prevLastExpr to have these alpha values
+                        */
                         Debug("BETA");
-                        markAwarded = doBetaReduction(prevLastExpr, currLastExpr, prevReducedExpr, currReducedExpr, curr);
+                        if(!markAwarded) //see the situation where currResult.size()==1
+                            markAwarded = doBetaReduction(prevLastExpr, currLastExpr, prevReducedExpr, currReducedExpr, curr);
+                        
+                        
                         if(markAwarded){
                             Debug("markAwarded, prevAlphaStr before: " + prevAlphaStr);
                             prevAlphaStr = prevReducedExpr.toString();
                             Debug("markAwarded, prevAlphaStr after: " + prevAlphaStr);
                         }
                         else{ 
-                            //may be alpha's still required in future
                             prevAlphaStr = prevReducedExpr.toString();
                             prevAlphaExpr = prevReducedExpr;    //prevReducedExpr will change below, keep Alpha state(s)
                             currAlphaStr = currAlphaExpr.toString();
@@ -531,7 +620,8 @@ public class Automarker {
                         
                         if(!markAwarded && require.equals("")){
                             //try applicative (default normal)
-                            Debug("mark not awarded, require empty");
+                            //don't try applicative if require is Normal (or anything else)
+                            Debug("mark not awarded and require empty");
                             Options.getEvaluationOrderOption().setValue(0);
                             currResult = stream.runExpr(curr.getExpression());  //get new reductions based on current line
                             Debug("currResult: " + currResult);
@@ -540,7 +630,6 @@ public class Automarker {
                             } catch (Parser.ParseException pe) {
                                 System.out.println(pe.getMessage());
                                 break;
-                                //jTextArea.setText(pe.getMessage());
                             }
                             prevReducedExpr = currResult.get(0);
                             currLastExpr = currResult.get(currResult.size()-1);
@@ -553,13 +642,15 @@ public class Automarker {
                     case 'n':
                     case 'η':
                         /*** ETA REDUCTIONS ***/
+                        /*
+                        if an eta reduction was performed, then the initial currResult performed by default before the switch
+                        statement needs to be re-calculated with eta reduction enabled. 
+                        Eta reductions happen relatively infrequently, so not too expensive to re-compute.
+                        Can then check correctness using beta reduction method, but with eta results instead.
+                        */
                         Debug("ETA");
                         Options.getEtaReductionsOption().setValue(true);
                         Debug(Options.getEtaReductionsOption().getValue());
-
-                        if(prev == null)
-                            continue;
-
                         currResult = stream.runExpr(prev.getExpression()); 
                         Options.getEtaReductionsOption().setValue(false);
                         Debug("currResult: " + currResult);
@@ -572,13 +663,19 @@ public class Automarker {
                         markAwarded = doBetaReduction(prevLastExpr, currLastExpr, prevReducedExpr, currReducedExpr, curr);
 
                         if(currResult.size()>2)
-                            currResult.set(1,currResult.get(2)); //move an element up to compensate for the prev expression used to recalculate currResult
+                            currResult.set(1,currResult.get(2)); //move an element up the list to compensate for the prev expression used to recalculate currResult
                         
                         break;
                     case '>':
                     case '→':
                     case '=':
                         /*** CONVERSION or ARITHMETIC ***/
+                        /*
+                        "divergent" should be stated using conversion
+                        if a student has a line the same as the previous, perhaps due to duplication
+                        or changing of brackets. As long as semantics of expression is the same, 
+                        don't penalise but no marks are awarded
+                        */
                         Debug("CONVERSION");
                         Debug("prevReducedExpr: " + prevReducedExpr);
                         Debug("currReducedExpr: " + currReducedExpr);
@@ -591,17 +688,18 @@ public class Automarker {
                                 markAwarded=true;
                             }
                         }
-                        //could be changed so that penalties only occur for beta reductions
-                        //user may have changed brackets, as long as still same expression, fine
+                        //user may have changed brackets, as long as still same semantic expression, fine
                         else if(prevReducedExpr.toString().equals(currReducedExpr.toString()) ){ 
                             markAwarded=true;
                             if(curr.getReduction()=='='){
                                 curr.setMark(1);
                             }else{
+                                //mark isn't actually awarded, just not penalised
                                 Debug("no mark penalty");
                             }
                         }
                         else{
+                            //mark isn't actually awarded, just not penalised
                             markAwarded = true;
                         }
                         break;
@@ -616,10 +714,11 @@ public class Automarker {
                 String reasoning = curr.getReasoning();
                 int splitIndex = reasoning.indexOf("/");
                 if(splitIndex<0){
-                    System.out.println("no split in reasoning");
                     if(curr.getReduction()=='n'||curr.getReduction()=='η'){
                         Debug("award mark for reasoning");
                         curr.addMark(1);
+                    }else{
+                        System.out.println("no split in reasoning");
                     }
                 }else{
                     String replacement = reasoning.substring(0,splitIndex);
@@ -868,10 +967,18 @@ public class Automarker {
                                 } catch (Parser.ParseException pe) {
                                     Debug("ParseException: " + pe.getMessage());
                                     if(pe.getMessage().equals("Right parenthesis missing")){
-                                        newStr = newStr+")";
-                                        //newStr = newStr.substring(0,initialIndex-1) + newStr.substring(initialIndex);
+                                        //
+                                        if(tempPrevStr.charAt(tempPrevStr.length()-1) == ')')
+                                            newStr = newStr+")";
+                                        else 
+                                            newStr = newStr.substring(0,initialIndex-2) + newStr.substring(initialIndex-1);
+                                            //for that rare occasion where this is better based on end of String before processing
+                                            //occurs in: 
+                                            //a b ((λc.c) d) e
+                                            //  = a b d e
+                                            //but automarker here detects as 
+                                            //    a b (d e),  
                                         Debug("newStr: " + newStr);
-                                        initialIndex-=1;//for further right parenthesis missing errors
                                     }else if(newStr.charAt(newStr.length()-1)==')'){
                                         newStr = newStr.substring(0,newStr.length()-2);
                                     }
@@ -886,13 +993,13 @@ public class Automarker {
                                 Debug("award mark for reasoning");
                                 curr.addMark(1);
                             }
-
                             break;    
                         case 'n':
                         case 'η':
                             Debug("ETA");
                             Debug("award mark for reasoning");
-                            curr.addMark(1);
+                            if(curr.getMark()==1)   //eta reduction correctly done already, award for reasoning
+                                curr.addMark(1);
                             break;
                         //case '>':
                         //case '→':
@@ -913,16 +1020,22 @@ public class Automarker {
             }
             sol.setMark(markPenalty);
             
-            Debug("------------------------------\n" + sol);
-            Debug("Mark penalty: " + (markPenalty-1) + "\n\n---------------------------------------------------------------------------");
+            Debug("------------------------------\n" + sol + "\n\n---------------------------------------------------------------------------");
         }
+        return solutions;
     }
     
+    /***
+     * countAlpha takes a string and counts the number of unique iX's where X = {INTEGER}.
+     * It is important for an 'i' to be followed by a number (as the calculator does when alpha reducing/converting).
+     * Thus no 'i' should be used in a typical student's answer.
+     * 
+     * @param alpha
+     * @return number of unique 'i's
+     */
     public int countAlpha(String alpha){
-        //count number of unique 'i's - indicative of alpha conversion by calculator
         int countI = -1;
-        int iNum=countI;
-
+        int iNum=-1;
         for(int i = 0;i<alpha.length();i++){
             char c = alpha.charAt(i);
             if(c=='i'){
@@ -932,12 +1045,17 @@ public class Automarker {
                 }
             }
         }
-        
         return countI;
     }
     
+    /***
+     * countI takes a string and counts the total number of iX's where X = {INTEGER}.
+     * This includes bound variables (as opposed to countAlpha)
+     * 
+     * @param alpha
+     * @return 
+     */
     public int countI(String alpha){
-        //count number of 'i's including bound vars
         int counter = 0;
         for( int i=0; i<alpha.length(); i++ ) {
             if(alpha.charAt(i) == 'i' ) {
@@ -946,7 +1064,18 @@ public class Automarker {
         }
         return counter;
     }
-    
+    /***
+     * doBetaReduction compares prevLastExpr to currLastExpr, then prevReducedExpr to currReducedExpr. If they are equal, a mark is assigned to curr
+     * the last expressions are compared to ensure both expressions distill to the same final form (semantically the same)
+     * the reduced expression from the previous calculation is compared to the reduced expression of the student's current line
+     * 
+     * @param prevLastExpr
+     * @param currLastExpr
+     * @param prevReducedExpr
+     * @param currReducedExpr
+     * @param curr
+     * @return true if the mark was awarded, false otherwise
+     */
     private boolean doBetaReduction(Expr prevLastExpr, Expr currLastExpr, Expr prevReducedExpr, Expr currReducedExpr, Line curr){
         if(prevLastExpr.toString().equals(currLastExpr.toString())){
             //reduced to same form
@@ -962,7 +1091,7 @@ public class Automarker {
 
             }
         }else if(finalResultsList.contains(currLastExpr.toString())){
-            //finalResultsList contain the final exprs derived from the original question at each step the its reduction
+            //finalResultsList contain the final exprs derived from the original question at each step of the reduction
             //thus, if there was a possible problem with the question in the calculator, this can help address it
             Debug("finalResultsList.contains(currReducedExpr.toString())");
             //reduced to same form
@@ -977,7 +1106,6 @@ public class Automarker {
                 return true;
 
             }
-            
         }
         return false;
     }
@@ -986,7 +1114,8 @@ public class Automarker {
     {
             try{
                 writer = new BufferedWriter(new FileWriter(new File("Report"+student.getStudentNum()+".txt"), false));	//new writer
-
+                writer.write(student.getSummaryReport().toString());
+                writer.close();
             } catch (Exception ex) {
             System.err.print("ReadError: " + ex.toString());
             } 

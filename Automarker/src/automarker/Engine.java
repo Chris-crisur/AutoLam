@@ -41,21 +41,20 @@ class Engine {
         int n = Options.getMaxLengthOption().getValue();
         try {
             expr = Parser.parse(string);
-        } catch (Parser.ParseException var9_9) {
-            System.out.println(var9_9.getMessage());
-            //jTextArea.setText(var9_9.getMessage());
+        } catch (Parser.ParseException pe) {
+            System.out.println(pe.getMessage());
             return null;
         }
         
         expr = context.substitute(expr);
         
-        expressions = new ArrayList<Expr>();
+        expressions = new ArrayList<>();
         expressions.add(expr);
            
         Expr expr3 = expr;
         int n2 = expr.size();
         Expr expr4 = Simplify.simplify(expr);
-        HashSet<ExprWrapper> hashSet = new HashSet<ExprWrapper>();
+        HashSet<ExprWrapper> hashSet = new HashSet<>();
         Expr[] arrexpr = new Expr[100];
         int n3 = -1;
         int n4 = 0;

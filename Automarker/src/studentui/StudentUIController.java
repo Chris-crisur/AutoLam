@@ -266,6 +266,8 @@ public class StudentUIController implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
         return true;}else{return false;}
+                
+        //return true;
     }
     
     @FXML

@@ -5,6 +5,7 @@
  */
 package tutorui;
 
+import automarker.AnalyticsReport;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,6 +22,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import automarker.Automarker;
 import automarker.Student;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
@@ -35,6 +38,7 @@ public class FXMLDocumentController implements Initializable {
     FileReader fr = null;
     Automarker marker;
     Student student;
+    AnalyticsReport ar;
     
     @FXML
     private Label lblError;
@@ -98,11 +102,14 @@ public class FXMLDocumentController implements Initializable {
     {
         students.add(stud);
         tblStudent.setItems(students);
+        ar.addStudent(stud.getStudentNum(),stud.getMark());
     }
    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+	String date = sdf.format(new Date());
+        ar = new AnalyticsReport(date);
     }    
     
 }

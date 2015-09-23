@@ -12,30 +12,19 @@ import java.util.*;
  * @author Annie
  */
 public class Report {
-    private int id;
-    private Date dateCreated;
-    //private Solution sol;
+    private static int id = 0;
+    private final String dateCreated;
 
-    public Report(Date dateCreated) {
+    public Report(String dateCreated) {
         this.dateCreated = dateCreated;
+        id+=1;
     }
 
     public int getId() {
         return id;
     }
 
-    public Date getDateCreated() {
+    public String getDateCreated() {
         return dateCreated;
     }
-
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-  
-    
 }
