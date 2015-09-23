@@ -1,0 +1,145 @@
+Solution 4456
+Date Submitted: null
+Question: SP1:3
+Real answer for (λx.λy.x y)(λx.x y)
+Separated symbols by whitespace (allows for longer symbol names)
+There are many ways to convert the bound variables in the equation
+above. It is a mistake to rename the free occurrence of y. Another
+mistake would be to change the meaning of the expression by
+omitting or rearranging parentheses. All conversions have to be
+done to get full marks. A mark is allocated for the right name as well.
+only square brackets, not what applied to
+	
+	(λx.λy.x y)(λx.x y)
+Answer: 
+α -> (λx.λv.x v)(λx.x y)		[v/y]] (1.0)
+β -> λv.(λx.x y) v		[(λx.x y)/u]] (1.0)
+β -> λv.v y		[v/x]] (1.0)
+Final mark: 3.0 out of 3.0	 penalty: 0
+Solution 4457
+Date Submitted: null
+Question: SP2:0
+Real answer for (λx.λy.xy)(λx.xy)
+Symbols not separated by whitespace
+Calculator won't detect
+	
+	(λx.λy.xy)(λx.xy)
+Answer: 
+α -> (λx.λv.xv)(λx.xy)		[v/y]] (0.0)
+β -> λv.(λx.xy)v		[(λx.xy)/u]] (0.0)
+β -> λv.vy		[v/x]] (0.0)
+Final mark: 0.0 out of 3.0	 penalty: 2
+Solution 4458
+Date Submitted: null
+Question: SP3:0
+Real answer for (λxy.xy)(λx.xy)
+Single char symbol. lambda expressions combined.
+Calculator won't detect
+	
+	(λxy.xy)(λx.xy)
+Answer: 
+α -> (λxv.xv)(λx.xy)		[v/y]] (0.0)
+β -> λv.(λx.xy) v		[(λx.xy)/u]] (0.0)
+β -> λv.vy		[v/x]] (0.0)
+Final mark: 0.0 out of 3.0	 penalty: 3
+Solution 4459
+Date Submitted: null
+Question: SP4:1
+Wrong answer for (λx.λy.x y)(λx.x y)
+free occurance of y renamed
+last beta wrong
+	
+	(λx.λy.x y)(λx.x y)
+Answer: 
+α -> (λx.λy.x y)(λx.x v)		[v/y]] (0.0)
+β -> λy.(λx.x v) y		[(λx.x v)/u]] (1.0)
+β -> λy.v y		[v/x]] (0.0)
+Final mark: 1.0 out of 3.0	 penalty: 2
+Solution 4460
+Date Submitted: null
+Question: SP5:3
+Real answer for (λ x.λ y.xy) (λ x.xy)
+gap between lambda and bound variable
+	
+	(λ x.λ y.x y) (λ x.x y)
+Answer: 
+α -> (λ x.λ v.x v) (λ x.x y)		[v/y]] (1.0)
+β -> λ v.(λ x.x y)v		[(λ x.x y)/u]] (1.0)
+β -> λ v.v y		[v/x]] (1.0)
+Final mark: 3.0 out of 3.0	 penalty: 0
+Solution 4461
+Date Submitted: null
+Question: SP6:4
+Right answer for (λx.x x)(λx.λy.x y)
+There are many ways to convert the bound variables in the equation
+above. All conversions have to be done to get full marks. An additional
+mark is allocated for the right name as well. If you combine steps you
+still get the marks (e.g., do the beta reduction without the first alpha
+conversion) provided they don’t amount to wrong guesses!
+	
+	(λx.x x)(λx.λy.x y)
+Answer: 
+α -> ((λz.(z z))(λx.(λy.(x y))))		[z/x]] (0.0)
+β -> ((λx.(λy.(x y))) (λx.(λy.(x y))))		[(λx.(λy.(x y))/z]] (1.0)
+α -> ((λx.(λv.(x v))) (λx.(λy.(x y))))		[v/y]] (1.0)
+β -> (λv.((λx.(λy.(x y))) v))		[(λx.(λy.(x y)))/u]] (1.0)
+β -> (λv.(λy.(v y)))		[v/x]] (1.0)
+→ -> λv.λy.v y	[] (0.0)
+Final mark: 4.0 out of 4.0	 penalty: 0
+Solution 4462
+Date Submitted: null
+Question: SP7:3
+Right answer for (λx.x x)(λx.x x)
+at least 1 beta reduction attempted
+	
+	(λx.x x)(λx.x x)
+Answer: 
+β -> (λx.x x)(λx.x x)		[(λx.x x)/x]] (1.0)
+→ -> divergent	[] (1.0)
+Final mark: 2.0 out of 3.0	 penalty: 0
+Solution 4463
+Date Submitted: null
+Question: SP8:2
+Right answer for (λ b.b)((λ a.a)(λ b.a b))
+applicative
+	Applicative
+	(λ b.b)((λ a.a)(λ b.a b))
+Answer: 
+β -> (λ b.b)(λ b.a b)		[(λ b.b)(λ b.a b)/a]] (1.0)
+β -> (λ b.a b)		[(λ b.a b)/b]] (1.0)
+Final mark: 2.0 out of 2.0	 penalty: 0
+Solution 4464
+Date Submitted: null
+Question: SP9:2
+Right answer for (λ b.b)((λ a.a)(λ b.a b))
+normal
+	Normal
+	(λ b.b)((λ a.a)(λ b.a b))
+Answer: 
+β -> (λ a.a)(λ b.a b)		[(λ a.a)(λ b.a b)/b]] (1.0)
+β -> (λ b.a b)		[(λ b.a b)/a]] (1.0)
+Final mark: 2.0 out of 2.0	 penalty: 0
+Solution 4465
+Date Submitted: null
+Question: SP10:2
+Right answer for (λ b.b)((λ a.a)(λ b.a b))
+non described method, but normal
+	
+	(λ b.b)((λ a.a)(λ b.a b))
+Answer: 
+β -> (λ a.a)(λ b.a b)		[(λ a.a)(λ b.a b)/b]] (1.0)
+β -> (λ b.a b)		[(λ b.a b)/a]] (1.0)
+Final mark: 2.0 out of 2.0	 penalty: 0
+Solution 4466
+Date Submitted: null
+Question: SP11:2
+Right answer for (λ b.b)((λ a.a)(λ b.a b))
+non described method, but applicative
+	
+	(λ b.b)((λ a.a)(λ b.a b))
+Answer: 
+β -> (λ b.b)(λ b.a b)		[(λ b.b)(λ b.a b)/a]] (1.0)
+β -> (λ b.a b)		[(λ b.a b)/b]] (1.0)
+Final mark: 2.0 out of 2.0	 penalty: 0
+Total mark: 21.0 out of 30.0
+Percentage: 70.0

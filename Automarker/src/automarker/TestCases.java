@@ -6,6 +6,7 @@
 package automarker;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,6 +44,11 @@ class TestCases {
         List<Solution> solutionList = new ArrayList<>();
         
         switch(index){
+            case "performance":
+                for(int i=0;i<100;i++){
+                    solutionList.addAll(Arrays.asList(loadTest("all")));
+                }
+                break;
             case "all":
                 
             case "alpha":
@@ -127,6 +133,14 @@ class TestCases {
                 solutionList.add(alphaTest20());
                 if(!index.equals("all")&&!index.equals("alpha"))
                     break;
+            case "a21":
+                solutionList.add(alphaTest21());
+                if(!index.equals("all")&&!index.equals("alpha"))
+                    break;
+            case "a22":
+                solutionList.add(alphaTest22());
+                if(!index.equals("all")&&!index.equals("alpha"))
+                    break;
             case "beta":
                 if(index.equals("alpha"))
                     break;
@@ -148,6 +162,22 @@ class TestCases {
                     break;
             case "b5":
                 solutionList.add(betaTestFive());
+                if(!index.equals("all")&&!index.equals("beta"))
+                    break;
+            case "b6":
+                solutionList.add(betaTestSix());
+                if(!index.equals("all")&&!index.equals("beta"))
+                    break;
+            case "b7":
+                solutionList.add(betaTestSeven());
+                if(!index.equals("all")&&!index.equals("beta"))
+                    break;
+            case "b8":
+                solutionList.add(betaTestEight());
+                if(!index.equals("all")&&!index.equals("beta"))
+                    break;
+            case "b9":
+                solutionList.add(betaTestNine());
                 if(!index.equals("all")&&!index.equals("beta"))
                     break;
             case "eta":
@@ -181,23 +211,8 @@ class TestCases {
                 solutionList.add(tutorialTestThree());
                 if(!index.equals("all")&&!index.equals("tutorial"))
                     break;
-            /*case "c2":
-                solutionList.add(conversionTestTwo());
-                if(!index.equals("all")&&!index.equals("conversion"))
-                    break;
-            case "c3":
-                solutionList.add(conversionTestThree());
-                if(!index.equals("all")&&!index.equals("conversion"))
-                    break;
-            case "c4":
-                solutionList.add(conversionTestFour());
-                if(!index.equals("all")&&!index.equals("conversion"))
-                    break;
-            case "c5":
-                solutionList.add(conversionTestFive());
-                if(!index.equals("all")&&!index.equals("conversion"))
-                    break;
-            */
+                
+                break;
             default:
                 System.out.println("no such test");
                 break;
@@ -679,6 +694,33 @@ class TestCases {
         return new Solution(new Question(descrip,14,require,start),lineArr.toArray(new Line[1]));
     }
    
+    private static Solution alphaTest21(){
+        String descrip = "A21:4.5";
+        String require = "";
+        String start = "(λx.λy. x y)(λx.x y z)";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("(λx.λv. x v)(λx.x v z)",'a',"v/y"));  //wrong change of y to v in latter part
+        lineArr.add(new Line("λv.(λx.x v z) v",'b',"(λx.x y z)/x"));    //wrong reasoning, correct reduction
+        lineArr.add(new Line("λv.(λx.x v z) v",'a',"u/z")); //wrong reasoning, correct reduction
+        lineArr.add(new Line("λv.v v z",'b',"v/x"));  //correct
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    private static Solution alphaTest22(){
+        String descrip = "A22:1.5";
+        String require = "";
+        String start = "(λx.λy. x y)(λx.x y z)";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("(λx.λv.λz. x v)(λx.x y u)",'a',"v/y")); //semi-right reasoning (v did replace y)
+        lineArr.add(new Line("λv.λz.(λx.x y u) v",'b',"(λx.x y z)/x"));//right reduction, wrong reasoning
+        lineArr.add(new Line("λv.λz.(λx.x y u) v",'a',"u/z"));//wrong (same as above line)
+        lineArr.add(new Line("λv.λz.v y z",'b',"v/x"));  //wrong
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
     
     //complex
     //(λx.λy.λz. x y)(λx.x y z (λz.λy.z y) x c)a b
@@ -809,6 +851,54 @@ class TestCases {
         
         return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
     }
+    
+    private static Solution betaTestSix(){
+        String descrip = "B6:2";
+        String require = "";
+        String start = "a b ((λc.c) d) e";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("a b d e",'b',"d/c"));
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    private static Solution betaTestSeven(){
+        String descrip = "B7:2";
+        String require = "";
+        String start = "a b (λc.c) d e";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("a b d e",'b',"d/c"));
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    private static Solution betaTestEight(){
+        String descrip = "B8:0";
+        String require = "";
+        String start = "a b ((λc.c) d) e";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("a b (d e)",'b',"d/c"));   //falsely placed parenthesese
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
+    private static Solution betaTestNine(){
+        String descrip = "B9:8";
+        String require = "";
+        String start = "(λa.b a) (λc.c c) (λd.d e)";
+        List<Line> lineArr = new ArrayList<>();
+        
+        lineArr.add(new Line("b (λc.c c) (λd.d e)",'b',"(λc.c c)/a"));
+        lineArr.add(new Line("b (λd.d e) (λd.d e)",'b',"(λd.d e)/c"));
+        lineArr.add(new Line("b (λd.d e) e",'b',"(λd.d e)/d"));
+        lineArr.add(new Line("b e e",'b',"e/d"));
+        
+        return new Solution(new Question(descrip,lineArr.size()*2,require,start),lineArr.toArray(new Line[1]));
+    }
+    
     
     /***
      * one alpha conversion required at start (same as alphaTestOne
