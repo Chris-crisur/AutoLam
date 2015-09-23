@@ -37,9 +37,7 @@
       </children>
     </VBox>
   </children>
-  <effect>
-    <SepiaTone />
-  </effect>
+  
   <stylesheets>
     <URL value="@studentui.css" />
   </stylesheets>

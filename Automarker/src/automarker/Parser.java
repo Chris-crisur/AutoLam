@@ -7,10 +7,10 @@ import automarker.Expr;
 
 
 /*     */ 
-/*     */ class Parser {
+/*     */ public class Parser {
 /*     */
 /*     */   
-/*     */   static class ParseException extends Exception {
+/*     */   public static class ParseException extends Exception {
 /*     */     public ParseException(Parser.Scanner paramScanner, String paramString) {
 /*  19 */       super(paramString);
 /*     */     }
@@ -146,7 +146,7 @@ import automarker.Expr;
 /* 150 */     return (Expr)localObject;
 /*     */   }
 /*     */   
-/*     */   static Expr parse(String paramString) throws Parser.ParseException {
+/*     */   public static Expr parse(String paramString) throws Parser.ParseException {
 /* 154 */     Scanner localScanner = new Scanner(paramString);
 /* 155 */     HashMap localHashMap = new HashMap();
 /* 156 */     Expr localExpr = parseExpr(localScanner, localHashMap);

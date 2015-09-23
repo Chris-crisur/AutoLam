@@ -37,10 +37,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import automarker.TutorialInterface;
+import automarker.Parser;
 import automarker.Line;
 import automarker.Solution;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 
@@ -131,7 +134,7 @@ public class StudentUIController implements Initializable {
     private class vbExpr extends VBox{
         HBox hbox ;
         
-        Label lblError = new Label("Error Label");
+        Label lblError = new Label();
         
         ObservableList<String> expr = FXCollections.observableArrayList("β", "α", "η", "→","=");
         ComboBox cbExpr;
@@ -152,6 +155,17 @@ public class StudentUIController implements Initializable {
             lblError.setTextFill(Color.web("#cc3100"));
             hbox.getChildren().addAll(cbExpr,edtExpr,edtReason);
             this.getChildren().addAll(hbox,lblError);
+            edtExpr.setOnAction(new EventHandler<ActionEvent>(){
+
+                @Override
+                public void handle(ActionEvent event) { String str = edtExpr.getText();
+                    try {
+                        Parser.parse(str);
+                    } catch (Parser.ParseException ex) {
+                        lblError.setText(ex.getMessage());
+                    }
+                }
+            });
             //this.getChildren().add(lblError);
        }
        public Line getLine(){
@@ -166,7 +180,7 @@ public class StudentUIController implements Initializable {
     private class QueTab extends Tab{
         
         SplitPane split = new SplitPane();
-        Pane pane;
+        VBox pane;
         Question question;
         VBox mycontainer;
         Line[] answers;
@@ -189,7 +203,7 @@ public class StudentUIController implements Initializable {
         }
         
             private Pane init(){
-            pane = new Pane();
+            pane = new VBox();
             pane.prefHeight(291); pane.prefWidth(600);
             pane.setLayoutX(-1);pane.setLayoutY(-6);
             
@@ -208,7 +222,10 @@ public class StudentUIController implements Initializable {
             });
             btnAdd.setLayoutX(242); btnAdd.setLayoutY(64);
             Label lblExpr = new Label(question.getStart()); lblExpr.setLayoutX(23); lblExpr.setLayoutY(66);
-            pane.getChildren().addAll(edtInfo,lblExpr,btnAdd);
+            HBox h = new HBox();
+            h.getChildren().addAll(lblExpr,btnAdd);
+            h.setSpacing(30);
+            pane.getChildren().addAll(edtInfo,h);
             return pane;
         }
         public Line[] Answer()
@@ -260,7 +277,7 @@ public class StudentUIController implements Initializable {
         
         ti.solutions = solutions;
         ti.saveSolutions();
-        setup("Login.fxml");
+        //setup("Login.fxml");
         
         }
     }
